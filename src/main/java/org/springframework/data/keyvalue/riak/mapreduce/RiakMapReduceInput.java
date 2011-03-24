@@ -26,7 +26,7 @@ import org.springframework.data.keyvalue.riak.mapreduce.filter.RiakMapReduceKeyF
  * @author Andrew Berman
  * 
  */
-@JsonSerialize(include=Inclusion.NON_NULL)
+@JsonSerialize(include = Inclusion.NON_NULL)
 abstract class RiakMapReduceInput {
 
 	public static final RiakMapReduceInput getInstance(String bucket) {
@@ -44,10 +44,9 @@ abstract class RiakMapReduceInput {
 	}
 
 	public static class RiakBucketInput extends RiakMapReduceInput {
-		@JsonProperty
+
 		private String bucket;
 
-		@JsonProperty("key_filters")
 		private RiakMapReduceKeyFilter[] bucketKeyFilters;
 
 		public RiakBucketInput(String bucket) {
@@ -59,6 +58,17 @@ abstract class RiakMapReduceInput {
 			this.bucket = bucket;
 			this.bucketKeyFilters = bucketKeyFilters;
 		}
+
+		@JsonProperty
+		public String getBucket() {
+			return bucket;
+		}
+
+		@JsonProperty("key_filters")
+		public RiakMapReduceKeyFilter[] getBucketKeyFilters() {
+			return bucketKeyFilters;
+		}
+
 	}
 
 	public static class RiakBucketKeyPairsInput extends RiakMapReduceInput {
