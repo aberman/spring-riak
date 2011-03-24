@@ -21,7 +21,6 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.data.keyvalue.riak.client.data.RiakBucket;
 import org.springframework.data.keyvalue.riak.client.data.RiakBucket.RiakBucketProperties;
 import org.springframework.data.keyvalue.riak.client.data.RiakResponse;
-import org.springframework.data.keyvalue.riak.client.data.RiakRestResponse;
 import org.springframework.data.keyvalue.riak.mapreduce.RiakMapReduceJob;
 import org.springframework.data.keyvalue.riak.parameter.RiakBucketReadParameters;
 import org.springframework.data.keyvalue.riak.parameter.RiakDeleteParameters;
@@ -33,7 +32,8 @@ import org.springframework.data.keyvalue.riak.parameter.RiakStoreParameters;
  * @author Andrew Berman
  * 
  */
-public interface RiakManager extends InitializingBean {
+public interface RiakManager<T extends RiakResponse<?>> extends
+		InitializingBean {
 	/*
 	 * Bucket operations
 	 */
@@ -48,11 +48,10 @@ public interface RiakManager extends InitializingBean {
 	/*
 	 * Key/Value operations
 	 */
-	RiakResponse<?> getValue(String bucket, String key)
-			throws RiakClientException;
+	T getValue(String bucket, String key) throws RiakClientException;
 
-	RiakResponse<?> getValue(String bucket, String key,
-			RiakReadParameters properties) throws RiakClientException;
+	T getValue(String bucket, String key, RiakReadParameters properties)
+			throws RiakClientException;
 
 	void storeKeyValue(String bucket, String key, byte[] value)
 			throws RiakClientException;
@@ -73,9 +72,8 @@ public interface RiakManager extends InitializingBean {
 	/*
 	 * Map/Reduce operations
 	 */
-	RiakRestResponse executeMapReduceJob(RiakMapReduceJob job)
-			throws RiakClientException;
+	T executeMapReduceJob(RiakMapReduceJob job) throws RiakClientException;
 
-	RiakRestResponse executeMapReduceJob(RiakMapReduceJob job,
+	T executeMapReduceJob(RiakMapReduceJob job,
 			RiakMapReduceParameters parameters) throws RiakClientException;
 }

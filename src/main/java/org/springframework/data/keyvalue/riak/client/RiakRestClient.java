@@ -44,7 +44,7 @@ import org.springframework.web.client.RestTemplate;
  * @author Andrew Berman
  * 
  */
-public class RiakRestClient implements RiakManager {
+public class RiakRestClient implements RiakManager<RiakRestResponse> {
 
 	private Log logger = LogFactory.getLog(getClass());
 
