@@ -15,6 +15,7 @@
  */
 package org.springframework.data.keyvalue.riak.mapreduce;
 
+import org.codehaus.jackson.annotate.JsonPropertyOrder;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 
@@ -23,6 +24,8 @@ import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
  * 
  */
 @JsonSerialize(include = Inclusion.NON_NULL)
+@JsonPropertyOrder({ "language", "name", "source", "bucket", "key", "arg",
+		"keep" })
 public abstract class RiakAbstractPhaseFunction<T extends RiakAbstractPhaseFunction<T>> {
 
 	private Boolean keep;
