@@ -46,11 +46,4 @@ public abstract class RiakParameters {
 	public String toQueryString() {
 		return StringUtils.join(toMap().entrySet(), "&");
 	}
-	
-	public static void main(String[] args) {
-		RiakReadParameters param = new RiakReadParameters();
-		param.setRead(3);
-		param.setVtag("rte");
-		System.out.println();
-	}
 }

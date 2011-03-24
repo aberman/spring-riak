@@ -20,14 +20,14 @@ package org.springframework.data.keyvalue.riak.parameter;
  * 
  */
 public class RiakBucketListParameters extends RiakParameters {
-	private boolean bucket = true;
+	private boolean buckets = true;
 
-	public boolean isBucket() {
-		return bucket;
+	public boolean isBuckets() {
+		return buckets;
 	}
 
-	public void setBucket(boolean bucket) {
-		this.bucket = bucket;
+	public void setBucket(boolean buckets) {
+		this.buckets = buckets;
 	}
 
 }

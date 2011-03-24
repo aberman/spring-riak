@@ -15,6 +15,8 @@
  */
 package org.springframework.data.keyvalue.riak.mapreduce;
 
+import org.apache.commons.lang.StringUtils;
+
 /**
  * @author andrewberman
  * 
@@ -23,11 +25,11 @@ public class RiakLinkPhase extends RiakAbstractPhaseFunction<RiakLinkPhase> {
 
 	private String bucket;
 
-	private String key;
+	private String tag;
 
-	public RiakLinkPhase(String bucket, String key) {
+	public RiakLinkPhase(String bucket, String tag) {
 		this.bucket = bucket;
-		this.key = key;
+		this.tag = tag;
 	}
 
 	public RiakLinkPhase(String bucket) {
@@ -38,7 +40,17 @@ public class RiakLinkPhase extends RiakAbstractPhaseFunction<RiakLinkPhase> {
 		return bucket;
 	}
 
-	public String getKey() {
-		return key;
-	}	
+	public String getTag() {
+		return tag;
+	}
+
+	public String toUrlFormat() {
+		String bucket = StringUtils.defaultIfBlank(getBucket(), "_");
+		String tag = StringUtils.defaultIfBlank(getTag(), "_");
+		String keep = StringUtils.defaultIfBlank(
+				super.getKeep() == null ? StringUtils.EMPTY : super.getKeep()
+						.toString(), "_");
+
+		return bucket + "," + tag + "," + keep;
+	}
 }

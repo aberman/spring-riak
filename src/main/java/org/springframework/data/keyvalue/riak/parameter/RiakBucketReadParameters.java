@@ -16,10 +16,11 @@
 package org.springframework.data.keyvalue.riak.parameter;
 
 import org.codehaus.jackson.annotate.JsonProperty;
+import org.codehaus.jackson.annotate.JsonValue;
 
 /**
  * @author Andrew Berman
- *
+ * 
  */
 public class RiakBucketReadParameters extends RiakParameters {
 	private boolean showProperties;
@@ -27,7 +28,25 @@ public class RiakBucketReadParameters extends RiakParameters {
 	private KeyRetrievalType keyRetrievalType;
 
 	public enum KeyRetrievalType {
-		TRUE, FALSE, STREAM
+		TRUE, FALSE, STREAM;
+
+		@Override
+		@JsonValue
+		public String toString() {
+			return super.toString().toLowerCase();
+		}
+
+	}
+
+	public RiakBucketReadParameters() {
+		super();
+	}
+
+	public RiakBucketReadParameters(boolean showProperties,
+			KeyRetrievalType keyRetrievalType) {
+		super();
+		this.showProperties = showProperties;
+		this.keyRetrievalType = keyRetrievalType;
 	}
 
 	@JsonProperty("props")
@@ -47,10 +66,10 @@ public class RiakBucketReadParameters extends RiakParameters {
 	}
 
 	@JsonProperty("keys")
-	public RiakBucketReadParameters setKeyRetrievalType(KeyRetrievalType keyRetrievalType) {
+	public RiakBucketReadParameters setKeyRetrievalType(
+			KeyRetrievalType keyRetrievalType) {
 		this.keyRetrievalType = keyRetrievalType;
 		return this;
 	}
 
 }
-

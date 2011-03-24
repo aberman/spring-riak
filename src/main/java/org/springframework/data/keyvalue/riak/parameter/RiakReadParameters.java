@@ -26,14 +26,27 @@ public class RiakReadParameters extends RiakParameters {
 
 	private String vtag;
 
+	public RiakReadParameters() {
+		super();
+	}
+	
+	
+	public RiakReadParameters(Integer read, String vtag) {
+		super();
+		this.read = read;
+		this.vtag = vtag;
+	}
+
+
 	@JsonProperty("r")
 	public Integer getRead() {
 		return read;
 	}
 
 	@JsonProperty("r")
-	public void setRead(Integer read) {
+	public RiakReadParameters setRead(Integer read) {
 		this.read = read;
+		return this;
 	}
 
 	@JsonProperty("vtag")
@@ -42,7 +55,8 @@ public class RiakReadParameters extends RiakParameters {
 	}
 
 	@JsonProperty("vtag")
-	public void setVtag(String vtag) {
+	public RiakReadParameters setVtag(String vtag) {
 		this.vtag = vtag;
+		return this;
 	}
 }

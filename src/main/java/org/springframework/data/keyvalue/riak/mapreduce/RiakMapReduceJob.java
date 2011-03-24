@@ -93,6 +93,10 @@ public class RiakMapReduceJob {
 		return this.addLink(bucket, null);
 	}
 
+	public RiakMapReduceJob addEmptyLink() {
+		return this.addLink(null, null);
+	}
+
 	public RiakMapReduceJob addMap(RiakMapReduceFunction mapFunction) {
 		riakPhases.add(Collections.singletonMap(PhaseType.MAP, mapFunction));
 		return this;

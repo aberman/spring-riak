@@ -29,6 +29,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.data.keyvalue.riak.client.data.RiakBucket;
 import org.springframework.data.keyvalue.riak.client.data.RiakBucket.RiakBucketProperties;
 import org.springframework.data.keyvalue.riak.client.data.RiakRestResponse;
+import org.springframework.data.keyvalue.riak.mapreduce.RiakLinkPhase;
 import org.springframework.data.keyvalue.riak.mapreduce.RiakMapReduceJob;
 import org.springframework.data.keyvalue.riak.parameter.RiakBucketListParameters;
 import org.springframework.data.keyvalue.riak.parameter.RiakBucketReadParameters;
@@ -140,15 +141,19 @@ public class RiakRestClient implements RiakManager<RiakRestResponse> {
 	@Override
 	public List<String> listBuckets() throws RiakClientException {
 		try {
-			Map<?, ?> list = restTemplate.getForObject(
+			Map<?, ?> map = restTemplate.getForObject(
 					getRiakUrl(new RiakBucketListParameters()), Map.class);
 
-			List<?> buckets = (List<?>) list.get("buckets");
-			List<String> bucketNames = new ArrayList<String>();
-			for (Iterator<?> it = buckets.iterator(); it.hasNext();)
-				bucketNames.add((String) it.next());
+			if (map != null && !map.isEmpty()) {
+				List<?> buckets = (List<?>) map.get("buckets");
+				List<String> bucketNames = new ArrayList<String>();
+				for (Iterator<?> it = buckets.iterator(); it.hasNext();)
+					bucketNames.add((String) it.next());
 
-			return bucketNames;
+				return bucketNames;
+			}
+
+			return null;
 		} catch (RestClientException e) {
 			throw new RiakClientException(e.getMessage(), e);
 		}
@@ -258,6 +263,21 @@ public class RiakRestClient implements RiakManager<RiakRestResponse> {
 				restTemplate.postForEntity(
 						getMapReduceUrl(parameters, (String[]) null), job,
 						byte[].class));
+	}
+
+	@Override
+	public RiakRestResponse walkLinks(String bucket, String key,
+			RiakLinkPhase... phases) throws RiakClientException {
+
+		List<String> pathParams = new ArrayList<String>(Arrays.asList(bucket,
+				key));
+
+		for (RiakLinkPhase phase : phases)
+			pathParams.add(phase.toUrlFormat());
+
+		return new RiakRestResponse(restTemplate.getForEntity(
+				getRiakUrl((String[]) pathParams.toArray(new String[pathParams
+						.size()])), byte[].class));
 	}
 
 	/*
