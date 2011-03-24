@@ -22,18 +22,16 @@ import java.util.Map;
 
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.annotate.JsonPropertyOrder;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 import org.springframework.data.keyvalue.riak.client.data.RiakBucketKeyValue;
-import org.springframework.data.keyvalue.riak.mapreduce.RiakJavascriptMapReduceFunction.RiakJavascriptBucketFunction;
 import org.springframework.data.keyvalue.riak.mapreduce.filter.RiakMapReduceKeyFilter;
 
 /**
  * @author Andrew Berman
  * 
  */
-@JsonPropertyOrder({ "inputs", "map", "reduce", "timeout" })
+@JsonPropertyOrder({ "inputs", "query", "timeout" })
 @JsonSerialize(include = Inclusion.NON_NULL)
 public class RiakMapReduceJob {
 
@@ -80,8 +78,9 @@ public class RiakMapReduceJob {
 		return riakPhases;
 	}
 
-	public void setTimeout(Integer timeout) {
+	public RiakMapReduceJob setTimeout(Integer timeout) {
 		this.timeout = timeout;
+		return this;
 	}
 
 	public RiakMapReduceJob addLink(String bucket, String tag) {
@@ -102,14 +101,5 @@ public class RiakMapReduceJob {
 	public RiakMapReduceJob addReduce(RiakMapReduceFunction mapFunction) {
 		riakPhases.add(Collections.singletonMap(PhaseType.REDUCE, mapFunction));
 		return this;
-	}
-
-	public static void main(String[] args) throws Exception {
-		RiakMapReduceJob job = new RiakMapReduceJob("dsfsdf").addMap(
-				new RiakJavascriptBucketFunction("bucket", "key").setKeep(true)
-						.setArg(234)).addLink("sadasd", "sdad");
-		ObjectMapper mapper = new ObjectMapper();
-		System.out.println(mapper.writeValueAsString(job));
-
 	}
 }
