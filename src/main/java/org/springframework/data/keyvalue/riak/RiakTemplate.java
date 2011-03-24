@@ -20,7 +20,6 @@ import java.util.Collection;
 import java.util.List;
 
 import org.codehaus.jackson.map.ObjectMapper;
-import org.springframework.dao.DataAccessException;
 import org.springframework.data.keyvalue.riak.client.RiakClientException;
 import org.springframework.data.keyvalue.riak.client.RiakManager;
 import org.springframework.data.keyvalue.riak.client.RiakRestClient;
@@ -43,7 +42,7 @@ public class RiakTemplate extends RiakAccessor implements RiakOperations {
 
 	}
 
-	public RiakTemplate(RiakManager riakManager) {
+	public RiakTemplate(RiakManager<? extends RiakRestResponse> riakManager) {
 		setRiakManager(riakManager);
 		mapper = new ObjectMapper();
 		afterPropertiesSet();
@@ -57,7 +56,7 @@ public class RiakTemplate extends RiakAccessor implements RiakOperations {
 	 */
 	@Override
 	public <T> T find(String key, Class<T> entityClass)
-			throws DataAccessException {
+			throws RiakDataException {
 		return find(entityClass.getName(), key, entityClass);
 	}
 
@@ -69,7 +68,7 @@ public class RiakTemplate extends RiakAccessor implements RiakOperations {
 	 */
 	@Override
 	public <T> T find(String bucket, String key, Class<T> entityClass)
-			throws DataAccessException {
+			throws RiakDataException {
 		RiakRestResponse response;
 		try {
 			response = (RiakRestResponse) getRiakManager()
@@ -91,19 +90,19 @@ public class RiakTemplate extends RiakAccessor implements RiakOperations {
 	 * java.lang.String)
 	 */
 	@Override
-	public Object find(String bucket, String key) throws DataAccessException {
+	public Object find(String bucket, String key) throws RiakDataException {
 		return find(bucket, key, Object.class);
 	}
 
 	@Override
 	public <T> List<T> find(Collection<String> keys, Class<T> entityClass)
-			throws DataAccessException {
+			throws RiakDataException {
 		return find(entityClass.getName(), keys, entityClass);
 	}
 
 	@Override
 	public <T> List<T> find(String bucket, Collection<String> keys,
-			Class<T> entityClass) throws DataAccessException {
+			Class<T> entityClass) throws RiakDataException {
 		List<T> list = new ArrayList<T>();
 
 		for (String key : keys)
@@ -114,7 +113,7 @@ public class RiakTemplate extends RiakAccessor implements RiakOperations {
 
 	@Override
 	public List<Object> find(String bucket, Collection<String> keys)
-			throws DataAccessException {
+			throws RiakDataException {
 		return find(bucket, keys, Object.class);
 	}
 
@@ -125,7 +124,7 @@ public class RiakTemplate extends RiakAccessor implements RiakOperations {
 	 * org.springframework.data.keyvalue.riak.RiakOperations#loadAll(java.lang.Class)
 	 */
 	@Override
-	public <T> List<T> loadAll(Class<T> entityClass) throws DataAccessException {
+	public <T> List<T> loadAll(Class<T> entityClass) throws RiakDataException {
 		return loadAll(entityClass.getName(), entityClass);
 	}
 
@@ -138,7 +137,7 @@ public class RiakTemplate extends RiakAccessor implements RiakOperations {
 	 */
 	@Override
 	public <T> List<T> loadAll(String bucket, Class<T> entityClass)
-			throws DataAccessException {
+			throws RiakDataException {
 		RiakBucket rBucket = getRiakManager().getBucketInformation(
 				bucket,
 				new RiakBucketReadParameters().setKeyRetrievalType(
@@ -158,7 +157,7 @@ public class RiakTemplate extends RiakAccessor implements RiakOperations {
 	 * org.springframework.data.keyvalue.riak.RiakOperations#loadAll(java.lang.String)
 	 */
 	@Override
-	public List<Object> loadAll(String bucket) throws DataAccessException {
+	public List<Object> loadAll(String bucket) throws RiakDataException {
 		return loadAll(bucket, Object.class);
 	}
 
@@ -169,7 +168,7 @@ public class RiakTemplate extends RiakAccessor implements RiakOperations {
 	 * org.springframework.data.keyvalue.riak.RiakOperations#persist(java.lang.Object)
 	 */
 	@Override
-	public String persist(Object entity) throws DataAccessException {
+	public String persist(Object entity) throws RiakDataException {
 		return persist(entity.getClass().getName(),
 				mapper.convertValue(entity, byte[].class));
 	}
@@ -183,7 +182,7 @@ public class RiakTemplate extends RiakAccessor implements RiakOperations {
 	 */
 	@Override
 	public String persist(String bucket, byte[] value)
-			throws DataAccessException {
+			throws RiakDataException {
 		return getRiakManager().storeValue(bucket, value);
 	}
 
@@ -195,7 +194,7 @@ public class RiakTemplate extends RiakAccessor implements RiakOperations {
 	 * java.lang.String)
 	 */
 	@Override
-	public void persist(Object entity, String key) throws DataAccessException {
+	public void persist(Object entity, String key) throws RiakDataException {
 		try {
 			persist(entity.getClass().getName(), key,
 					mapper.writeValueAsBytes(entity));
@@ -214,7 +213,7 @@ public class RiakTemplate extends RiakAccessor implements RiakOperations {
 	 */
 	@Override
 	public void persist(final String bucket, final String key,
-			final byte[] value) throws DataAccessException {
+			final byte[] value) throws RiakDataException {
 		getRiakManager().storeKeyValue(bucket, key, value);
 	}
 
@@ -226,7 +225,7 @@ public class RiakTemplate extends RiakAccessor implements RiakOperations {
 	 */
 	@Override
 	public void remove(Class<?> entityClass, String key)
-			throws DataAccessException {
+			throws RiakDataException {
 		remove(entityClass.getName(), key);
 	}
 
@@ -238,7 +237,7 @@ public class RiakTemplate extends RiakAccessor implements RiakOperations {
 	 * java.lang.String)
 	 */
 	@Override
-	public void remove(String bucket, String key) throws DataAccessException {
+	public void remove(String bucket, String key) throws RiakDataException {
 		getRiakManager().deleteKey(bucket, key);
 	}
 
@@ -251,7 +250,7 @@ public class RiakTemplate extends RiakAccessor implements RiakOperations {
 	 */
 	@Override
 	public void removeAll(Class<?> entityClass, Collection<String> keys)
-			throws DataAccessException {
+			throws RiakDataException {
 		for (String key : keys)
 			remove(entityClass, key);
 	}
@@ -265,7 +264,7 @@ public class RiakTemplate extends RiakAccessor implements RiakOperations {
 	 */
 	@Override
 	public <T> T findByProperty(Class<T> entityClass, String property)
-			throws DataAccessException {
+			throws RiakDataException {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -279,7 +278,7 @@ public class RiakTemplate extends RiakAccessor implements RiakOperations {
 	 */
 	@Override
 	public <T> T executeMapReduceJobSingleResult(RiakMapReduceJob job,
-			Class<T> entityClass) throws DataAccessException {
+			Class<T> entityClass) throws RiakDataException {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -293,7 +292,7 @@ public class RiakTemplate extends RiakAccessor implements RiakOperations {
 	 */
 	@Override
 	public <T> List<T> executeMapReduceJob(RiakMapReduceJob job,
-			Class<T> entityClass) throws DataAccessException {
+			Class<T> entityClass) throws RiakDataException {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -306,7 +305,7 @@ public class RiakTemplate extends RiakAccessor implements RiakOperations {
 	 * .data.riak.RiakCallback)
 	 */
 	@Override
-	public <T> T execute(RiakCallback<T> action) throws DataAccessException {
+	public <T> T execute(RiakCallback<T> action) throws RiakDataException {
 		Assert.notNull(action, "Callback object must not be null");
 
 		RiakRestClient rm = (RiakRestClient) getRiakManager();

@@ -19,6 +19,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.data.keyvalue.riak.client.RiakManager;
+import org.springframework.data.keyvalue.riak.client.data.RiakResponse;
+import org.springframework.data.keyvalue.riak.util.RiakExtraInfo;
 
 /**
  * Base class for {@link RiakTemplate} and other Riak accessing gateway helpers,
@@ -33,14 +35,14 @@ import org.springframework.data.keyvalue.riak.client.RiakManager;
  */
 public abstract class RiakAccessor implements InitializingBean {
 
-	private RiakManager riakManager;
+	private RiakManager<? extends RiakResponse<? extends RiakExtraInfo>> riakManager;
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
 	/**
 	 * @return the riakManager
 	 */
-	public RiakManager getRiakManager() {
+	public RiakManager<? extends RiakResponse<? extends RiakExtraInfo>> getRiakManager() {
 		return riakManager;
 	}
 
@@ -48,7 +50,8 @@ public abstract class RiakAccessor implements InitializingBean {
 	 * @param riakManager
 	 *            the riakManager to set
 	 */
-	public void setRiakManager(RiakManager riakManager) {
+	public void setRiakManager(
+			RiakManager<? extends RiakResponse<? extends RiakExtraInfo>> riakManager) {
 		this.riakManager = riakManager;
 	}
 

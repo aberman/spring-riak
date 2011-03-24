@@ -15,13 +15,13 @@
  */
 package org.springframework.data.keyvalue.riak;
 
-import org.springframework.dao.DataAccessException;
+import org.springframework.core.NestedRuntimeException;
 
 /**
  * @author Andrew Berman
  * 
  */
-public class RiakDataException extends DataAccessException {
+public class RiakDataException extends NestedRuntimeException {
 
 	/**
 	 * 

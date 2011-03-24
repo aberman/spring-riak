@@ -18,7 +18,6 @@ package org.springframework.data.keyvalue.riak;
 import java.util.Collection;
 import java.util.List;
 
-import org.springframework.dao.DataAccessException;
 import org.springframework.data.keyvalue.riak.mapreduce.RiakMapReduceJob;
 
 /**
@@ -26,55 +25,55 @@ import org.springframework.data.keyvalue.riak.mapreduce.RiakMapReduceJob;
  * 
  */
 public interface RiakOperations {
-	<T> T find(String key, Class<T> entityClass) throws DataAccessException;
+	<T> T find(String key, Class<T> entityClass) throws RiakDataException;
 
 	<T> T find(String bucket, String key, Class<T> entityClass)
-			throws DataAccessException;
+			throws RiakDataException;
 
-	Object find(String bucket, String key) throws DataAccessException;
+	Object find(String bucket, String key) throws RiakDataException;
 
 	<T> List<T> find(Collection<String> keys, Class<T> entityClass)
-			throws DataAccessException;
+			throws RiakDataException;
 
 	<T> List<T> find(String bucket, Collection<String> keys, Class<T> entityClass)
-			throws DataAccessException;
+			throws RiakDataException;
 
 	List<Object> find(String bucket, Collection<String> keys)
-			throws DataAccessException;
+			throws RiakDataException;
 
-	<T> List<T> loadAll(Class<T> entityClass) throws DataAccessException;
+	<T> List<T> loadAll(Class<T> entityClass) throws RiakDataException;
 
 	<T> List<T> loadAll(String bucket, Class<T> entityClass)
-			throws DataAccessException;
+			throws RiakDataException;
 
-	List<Object> loadAll(String bucket) throws DataAccessException;
+	List<Object> loadAll(String bucket) throws RiakDataException;
 
-	String persist(Object entity) throws DataAccessException;
+	String persist(Object entity) throws RiakDataException;
 
-	String persist(String bucket, byte[] value) throws DataAccessException;
+	String persist(String bucket, byte[] value) throws RiakDataException;
 
-	void persist(Object entity, String key) throws DataAccessException;
+	void persist(Object entity, String key) throws RiakDataException;
 
 	void persist(String bucket, String key, byte[] value)
-			throws DataAccessException;
+			throws RiakDataException;
 
-	void remove(Class<?> entityClass, String key) throws DataAccessException;
+	void remove(Class<?> entityClass, String key) throws RiakDataException;
 
-	void remove(String bucket, String key) throws DataAccessException;
+	void remove(String bucket, String key) throws RiakDataException;
 
 	void removeAll(Class<?> entityClass, Collection<String> keys)
-			throws DataAccessException;
+			throws RiakDataException;
 
 	<T> T findByProperty(Class<T> entityClass, String property)
-			throws DataAccessException;
+			throws RiakDataException;
 
 	<T> T executeMapReduceJobSingleResult(RiakMapReduceJob job,
-			Class<T> entityClass) throws DataAccessException;
+			Class<T> entityClass) throws RiakDataException;
 
 	<T> List<T> executeMapReduceJob(RiakMapReduceJob job, Class<T> entityClass)
-			throws DataAccessException;
+			throws RiakDataException;
 
-	<T> T execute(RiakCallback<T> action) throws DataAccessException;
+	<T> T execute(RiakCallback<T> action) throws RiakDataException;
 
 	// Add walking for links
 }
