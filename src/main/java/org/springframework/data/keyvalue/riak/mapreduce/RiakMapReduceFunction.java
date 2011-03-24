@@ -15,10 +15,48 @@
  */
 package org.springframework.data.keyvalue.riak.mapreduce;
 
+import org.codehaus.jackson.annotate.JsonPropertyOrder;
+import org.codehaus.jackson.annotate.JsonValue;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
+import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
+
 /**
  * @author Andrew Berman
- *
+ * 
  */
-public interface RiakMapReduceFunction {
+@JsonSerialize(include = Inclusion.NON_NULL)
+@JsonPropertyOrder({ "language", "name", "source", "bucket", "key", "arg",
+		"keep" })
+public abstract class RiakMapReduceFunction extends RiakAbstractPhaseFunction<RiakMapReduceFunction> {
+	public enum Language {
+		JAVASCRIPT, ERLANG;
+
+		@Override
+		@JsonValue
+		public String toString() {
+			return super.toString().toLowerCase();
+		}
+	}
+
+	private Object arg;
+
+	private Language language;
+
+	protected RiakMapReduceFunction(Language language) {
+		this.language = language;
+	}
+
+	public Language getLanguage() {
+		return language;
+	}
+
+	public Object getArg() {
+		return arg;
+	}
+
+	public RiakMapReduceFunction setArg(Object arg) {
+		this.arg = arg;
+		return this;
+	}
 
 }

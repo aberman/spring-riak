@@ -13,22 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.keyvalue.riak.data;
+package org.springframework.data.keyvalue.riak.client.data;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.annotate.JsonValue;
 
 /**
  * @author Andrew Berman
  * 
  */
-public class RiakBucketKeyPair implements Serializable {
+public class RiakBucketKeyValue implements Serializable {
 	/**
 	 * 
 	 */
@@ -36,39 +32,41 @@ public class RiakBucketKeyPair implements Serializable {
 
 	private String bucket;
 
-	private Set<String> keys;
+	private String key;
 
-	public RiakBucketKeyPair(String bucket) {
+	private String data;
+
+	public RiakBucketKeyValue(String bucket, String key) {
 		this.bucket = bucket;
+		this.key = key;
 	}
 
-	public RiakBucketKeyPair(String bucket, String... keys) {
+	public RiakBucketKeyValue(String bucket, String key, String data) {
 		this.bucket = bucket;
-		this.keys = new HashSet<String>(Arrays.asList(keys));
-	}
-
-	public RiakBucketKeyPair addKey(String key) {
-		this.keys.add(key);
-		return this;
+		this.key = key;
+		this.data = data;
 	}
 
 	public String getBucket() {
 		return bucket;
 	}
 
-	public Set<String> getKeys() {
-		return keys;
+	public String getKey() {
+		return key;
+	}
+
+	public String getData() {
+		return data;
 	}
 
 	@JsonValue
-	public List<String[]> toListArray() {
-		List<String[]> list = new ArrayList<String[]>();
-
-		for (String key : keys) {
-			list.add(new String[] { bucket, key });
-		}
-
-		return list;
+	public String[] toArray() {
+		if (StringUtils.isNotBlank(key) && StringUtils.isNotBlank(data))
+			return new String[] { bucket, key, data };
+		else if (StringUtils.isNotBlank(key))
+			return new String[] { bucket, key };
+		else
+			return new String[] { bucket };
 	}
 
 }

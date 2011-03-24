@@ -13,18 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.keyvalue.riak.mapreduce.filter;
-
-import java.io.Serializable;
-
-import org.codehaus.jackson.annotate.JsonValue;
+package org.springframework.data.keyvalue.riak.client.data;
 
 /**
  * @author Andrew Berman
  * 
  */
-public interface RiakMapReduceFilter extends Serializable {
-	
-	@JsonValue
-	public Object[] getValueArray();
+public interface RiakResponse<T> {
+	byte[] getBytes();
+
+	T getExtraInfo();
 }

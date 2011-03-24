@@ -16,162 +16,100 @@
 package org.springframework.data.keyvalue.riak.mapreduce;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.annotate.JsonPropertyOrder;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
-import org.springframework.data.keyvalue.riak.data.RiakBucketKeyPair;
-import org.springframework.data.keyvalue.riak.mapreduce.filter.RiakMapReduceFilter;
-import org.springframework.data.keyvalue.riak.mapreduce.filter.RiakMapReduceRestrictions;
-import org.springframework.data.keyvalue.riak.mapreduce.filter.RiakMapReduceTransformations;
+import org.springframework.data.keyvalue.riak.client.data.RiakBucketKeyValue;
+import org.springframework.data.keyvalue.riak.mapreduce.RiakJavascriptMapReduceFunction.RiakJavascriptBucketFunction;
+import org.springframework.data.keyvalue.riak.mapreduce.filter.RiakMapReduceKeyFilter;
 
 /**
  * @author Andrew Berman
  * 
  */
-@JsonPropertyOrder({ "bucket", "key_filters", "map" })
+@JsonPropertyOrder({ "inputs", "map", "reduce", "timeout" })
+@JsonSerialize(include = Inclusion.NON_NULL)
 public class RiakMapReduceJob {
 
 	private Integer timeout;
 
-	@JsonProperty
-	private Inputs inputs;
+	private RiakMapReduceInput input;
 
-	@JsonProperty("map")
-	private List<Phase> phases = new ArrayList<Phase>();
+	private List<Map<PhaseType, ? extends RiakAbstractPhaseFunction<?>>> riakPhases = new ArrayList<Map<PhaseType, ? extends RiakAbstractPhaseFunction<?>>>();
 
 	private enum PhaseType {
-		MAP, REDUCE, LINK
+		MAP, REDUCE, LINK;
+
+		@Override
+		public String toString() {
+			return super.toString().toLowerCase();
+		}
+
 	}
 
 	public RiakMapReduceJob(String bucket) {
-		this.inputs = new Inputs(bucket);
+		this.input = RiakMapReduceInput.getInstance(bucket);
 	}
 
-	public RiakMapReduceJob(RiakBucketKeyPair bucketKeyPairs) {
-		this.inputs = new Inputs(bucketKeyPairs);
+	public RiakMapReduceJob(RiakBucketKeyValue... bucketKeyPairs) {
+		this.input = RiakMapReduceInput.getInstance(bucketKeyPairs);
 	}
 
-//	public RiakMapReduceJob addBucketKeyPairs(
-//			RiakBucketKeyPair... bucketKeyPairs) {
-//		this.inputs.getBucketKeyPairs().addAll(Arrays.asList(bucketKeyPairs));
-//		return this;
-//	}
+	public RiakMapReduceJob(String bucket, RiakMapReduceKeyFilter... filter) {
+		this.input = RiakMapReduceInput.getInstance(bucket, filter);
+	}
 
+	@JsonProperty
 	public Integer getTimeout() {
 		return timeout;
+	}
+
+	@JsonProperty("inputs")
+	RiakMapReduceInput getInput() {
+		return input;
+	}
+
+	@JsonProperty("query")
+	List<Map<PhaseType, ? extends RiakAbstractPhaseFunction<?>>> getPhases() {
+		return riakPhases;
 	}
 
 	public void setTimeout(Integer timeout) {
 		this.timeout = timeout;
 	}
 
-	public RiakMapReduceJob addFilter(RiakMapReduceFilter... filters) {
-		this.inputs.getFilters().addAll(Arrays.asList(filters));
+	public RiakMapReduceJob addLink(String bucket, String tag) {
+		riakPhases.add(Collections.singletonMap(PhaseType.LINK,
+				new RiakLinkPhase(bucket, tag)));
 		return this;
 	}
 
-	public RiakMapReduceJob addLink(String bucket, boolean keepResults) {
-		return addLink(bucket, null, keepResults);
+	public RiakMapReduceJob addLink(String bucket) {
+		return this.addLink(bucket, null);
 	}
 
-	public RiakMapReduceJob addLink(String bucket, String tag,
-			boolean keepResults) {
-		phases.add(new Phase(PhaseType.LINK, new RiakLinkFunction(bucket, tag),
-				null, keepResults));
+	public RiakMapReduceJob addMap(RiakMapReduceFunction mapFunction) {
+		riakPhases.add(Collections.singletonMap(PhaseType.MAP, mapFunction));
 		return this;
 	}
 
-	public RiakMapReduceJob addMap(RiakMapReduceFunction mapFunction,
-			boolean keepResults) {
-		return addMap(mapFunction, null, keepResults);
-	}
-
-	public RiakMapReduceJob addMap(RiakMapReduceFunction mapFunction,
-			Object functionArg, boolean keepResults) {
-		phases.add(new Phase(PhaseType.REDUCE, mapFunction, functionArg,
-				keepResults));
+	public RiakMapReduceJob addReduce(RiakMapReduceFunction mapFunction) {
+		riakPhases.add(Collections.singletonMap(PhaseType.REDUCE, mapFunction));
 		return this;
-	}
-
-	public RiakMapReduceJob addReduce(RiakMapReduceFunction mapFunction,
-			boolean keepResults) {
-		return addMap(mapFunction, null, keepResults);
-	}
-
-	public RiakMapReduceJob addReduce(RiakMapReduceFunction mapFunction,
-			Object functionArg, boolean keepResults) {
-		phases.add(new Phase(PhaseType.REDUCE, mapFunction, functionArg,
-				keepResults));
-		return this;
-	}
-
-	private class Phase {
-		private PhaseType type;
-		private RiakMapReduceFunction function;
-		private Object arg;
-		private boolean keepResults;
-
-		public Phase(PhaseType type, RiakMapReduceFunction function,
-				Object arg, boolean keepResults) {
-			this.type = type;
-			this.function = function;
-			this.arg = arg;
-			this.keepResults = keepResults;
-		}
-
-	}
-
-	@JsonPropertyOrder({ "bucket", "bucketKeyPairs", "filters" })
-	@JsonSerialize(include = Inclusion.NON_NULL)
-	private class Inputs {
-		private String bucket;
-
-		private List<RiakMapReduceFilter> filters = new ArrayList<RiakMapReduceFilter>();
-
-		private RiakBucketKeyPair bucketKeyPair;
-
-		public Inputs(String bucket) {
-			this.bucket = bucket;
-		}
-
-		public Inputs(RiakBucketKeyPair keyPair) {
-			this.bucketKeyPair = keyPair;
-		}
-		
-		public Inputs(RiakMapReduceFilter... filters) {
-			this.filters.addAll(Arrays.asList(filters));
-		}
-
-		@JsonProperty("bucket")
-		public String getBucket() {
-			return bucket;
-		}
-
-		@JsonProperty("key_filters")
-		public List<RiakMapReduceFilter> getFilters() {
-			return filters;
-		}
-
-		@JsonProperty
-		public RiakBucketKeyPair getBucketKeyPair() {
-			return bucketKeyPair;
-		}
-
 	}
 
 	public static void main(String[] args) throws Exception {
-		RiakMapReduceJob job = new RiakMapReduceJob(new RiakBucketKeyPair(
-				"test", "test1", "test2")).addFilter(
-				RiakMapReduceRestrictions.between(1, 2, true)).addFilter(
-				RiakMapReduceTransformations.floatToString());
+		RiakMapReduceJob job = new RiakMapReduceJob("dsfsdf").addMap(
+				new RiakJavascriptBucketFunction("bucket", "key").setKeep(true)
+						.setArg(234)).addLink("sadasd", "sdad");
 		ObjectMapper mapper = new ObjectMapper();
 		System.out.println(mapper.writeValueAsString(job));
 
 	}
-
 }

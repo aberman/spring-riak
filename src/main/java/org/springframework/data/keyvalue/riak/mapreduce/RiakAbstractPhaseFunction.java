@@ -13,14 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.keyvalue.riak.data;
+package org.springframework.data.keyvalue.riak.mapreduce;
+
+import org.codehaus.jackson.map.annotate.JsonSerialize;
+import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 
 /**
- * @author Andrew Berman
+ * @author andrewberman
  * 
  */
-public interface RiakResponse<T> {
-	byte[] getBytes();
+@JsonSerialize(include = Inclusion.NON_NULL)
+public abstract class RiakAbstractPhaseFunction<T extends RiakAbstractPhaseFunction<T>> {
 
-	T getExtraInfo();
+	private Boolean keep;
+
+	public Boolean getKeep() {
+		return keep;
+	}
+
+	@SuppressWarnings("unchecked")
+	public T setKeep(Boolean keep) {
+		this.keep = keep;
+		return (T) this;
+	}
 }

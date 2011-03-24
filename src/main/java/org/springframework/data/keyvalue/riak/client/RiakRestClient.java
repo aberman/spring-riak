@@ -26,10 +26,10 @@ import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.data.keyvalue.riak.data.RiakBucket;
-import org.springframework.data.keyvalue.riak.data.RiakRestResponse;
-import org.springframework.data.keyvalue.riak.data.RiakBucket.RiakBucketProperties;
-import org.springframework.data.keyvalue.riak.mapreduce.RiakMapReduceFunction;
+import org.springframework.data.keyvalue.riak.client.data.RiakBucket;
+import org.springframework.data.keyvalue.riak.client.data.RiakBucket.RiakBucketProperties;
+import org.springframework.data.keyvalue.riak.client.data.RiakRestResponse;
+import org.springframework.data.keyvalue.riak.mapreduce.RiakMapReduceJob;
 import org.springframework.data.keyvalue.riak.parameter.RiakBucketListParameters;
 import org.springframework.data.keyvalue.riak.parameter.RiakBucketReadParameters;
 import org.springframework.data.keyvalue.riak.parameter.RiakDeleteParameters;
@@ -135,10 +135,6 @@ public class RiakRestClient implements RiakManager {
 	private String getMapReduceUrl(RiakParameters parameters,
 			String... pathParams) {
 		return getUrl("mapred", parameters, pathParams);
-	}
-
-	private String getMapReduceUrl(String... pathParams) {
-		return getMapReduceUrl(null, pathParams);
 	}
 
 	@Override
@@ -250,18 +246,18 @@ public class RiakRestClient implements RiakManager {
 	}
 
 	@Override
-	public RiakRestResponse executeMapReduceFunction(
-			RiakMapReduceFunction function) throws RiakClientException {
-		return executeMapReduceFunction(function, null);
+	public RiakRestResponse executeMapReduceJob(RiakMapReduceJob job)
+			throws RiakClientException {
+		return executeMapReduceJob(job, null);
 	}
 
 	@Override
-	public RiakRestResponse executeMapReduceFunction(
-			RiakMapReduceFunction function, RiakMapReduceParameters parameters)
-			throws RiakClientException {
-		return new RiakRestResponse(restTemplate.postForEntity(
-				getMapReduceUrl(parameters, (String[]) null), function,
-				byte[].class));
+	public RiakRestResponse executeMapReduceJob(RiakMapReduceJob job,
+			RiakMapReduceParameters parameters) throws RiakClientException {
+		return new RiakRestResponse(
+				restTemplate.postForEntity(
+						getMapReduceUrl(parameters, (String[]) null), job,
+						byte[].class));
 	}
 
 	/*

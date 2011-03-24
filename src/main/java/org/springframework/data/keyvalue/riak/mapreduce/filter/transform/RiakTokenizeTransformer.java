@@ -15,13 +15,13 @@
  */
 package org.springframework.data.keyvalue.riak.mapreduce.filter.transform;
 
-import org.springframework.data.keyvalue.riak.mapreduce.filter.RiakMapReduceFilter;
+import org.springframework.data.keyvalue.riak.mapreduce.filter.RiakMapReduceKeyFilter;
 
 /**
  * @author Andrew Berman
  * 
  */
-public class RiakTokenizeTransformer implements RiakMapReduceFilter {
+public class RiakTokenizeTransformer implements RiakMapReduceKeyFilter {
 
 	/**
 	 * 

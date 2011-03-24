@@ -15,13 +15,13 @@
  */
 package org.springframework.data.keyvalue.riak.mapreduce.filter.predicate;
 
-import org.springframework.data.keyvalue.riak.mapreduce.filter.RiakMapReduceFilter;
+import org.springframework.data.keyvalue.riak.mapreduce.filter.RiakMapReduceKeyFilter;
 
 /**
  * @author Andrew Berman
  * 
  */
-public class RiakBetweenPredicate implements RiakMapReduceFilter {
+public class RiakBetweenPredicate implements RiakMapReduceKeyFilter {
 
 	/**
 	 * 

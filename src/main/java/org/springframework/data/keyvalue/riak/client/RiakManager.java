@@ -18,11 +18,11 @@ package org.springframework.data.keyvalue.riak.client;
 import java.util.List;
 
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.data.keyvalue.riak.data.RiakBucket;
-import org.springframework.data.keyvalue.riak.data.RiakResponse;
-import org.springframework.data.keyvalue.riak.data.RiakRestResponse;
-import org.springframework.data.keyvalue.riak.data.RiakBucket.RiakBucketProperties;
-import org.springframework.data.keyvalue.riak.mapreduce.RiakMapReduceFunction;
+import org.springframework.data.keyvalue.riak.client.data.RiakBucket;
+import org.springframework.data.keyvalue.riak.client.data.RiakBucket.RiakBucketProperties;
+import org.springframework.data.keyvalue.riak.client.data.RiakResponse;
+import org.springframework.data.keyvalue.riak.client.data.RiakRestResponse;
+import org.springframework.data.keyvalue.riak.mapreduce.RiakMapReduceJob;
 import org.springframework.data.keyvalue.riak.parameter.RiakBucketReadParameters;
 import org.springframework.data.keyvalue.riak.parameter.RiakDeleteParameters;
 import org.springframework.data.keyvalue.riak.parameter.RiakMapReduceParameters;
@@ -73,9 +73,9 @@ public interface RiakManager extends InitializingBean {
 	/*
 	 * Map/Reduce operations
 	 */
-	RiakRestResponse executeMapReduceFunction(RiakMapReduceFunction function)
+	RiakRestResponse executeMapReduceJob(RiakMapReduceJob job)
 			throws RiakClientException;
 
-	RiakRestResponse executeMapReduceFunction(RiakMapReduceFunction function,
+	RiakRestResponse executeMapReduceJob(RiakMapReduceJob job,
 			RiakMapReduceParameters parameters) throws RiakClientException;
 }

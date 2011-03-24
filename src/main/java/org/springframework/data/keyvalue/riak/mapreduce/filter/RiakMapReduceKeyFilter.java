@@ -13,23 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.keyvalue.riak.mapreduce;
+package org.springframework.data.keyvalue.riak.mapreduce.filter;
+
+import java.io.Serializable;
+
+import org.codehaus.jackson.annotate.JsonValue;
 
 /**
  * @author Andrew Berman
- *
+ * 
  */
-public class RiakLinkFunction implements RiakMapReduceFunction {
-	private String bucket;
+public interface RiakMapReduceKeyFilter extends Serializable {
 	
-	private String tag;
-	
-	public RiakLinkFunction(String bucket) {
-		this.bucket = bucket;
-	}
-	
-	public RiakLinkFunction(String bucket, String tag) {
-		this.bucket = bucket;
-		this.tag = tag;
-	}
+	@JsonValue
+	public Object[] getValueArray();
 }

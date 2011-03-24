@@ -13,24 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.keyvalue.riak.parameter;
-
-import org.codehaus.jackson.annotate.JsonProperty;
+package org.springframework.data.keyvalue.riak.mapreduce;
 
 /**
- * @author Andrew Berman
+ * @author andrewberman
  * 
  */
-public class RiakMapReduceParameters extends RiakParameters {
-	private Boolean chunked;
+public class RiakLinkPhase extends RiakAbstractPhaseFunction<RiakLinkPhase> {
 
-	@JsonProperty("chunked")
-	public Boolean getChunked() {
-		return chunked;
+	private String bucket;
+
+	private String key;
+
+	public RiakLinkPhase(String bucket, String key) {
+		this.bucket = bucket;
+		this.key = key;
 	}
 
-	public void setChunked(Boolean chunked) {
-		this.chunked = chunked;
+	public RiakLinkPhase(String bucket) {
+		this(bucket, null);
 	}
 
+	public String getBucket() {
+		return bucket;
+	}
+
+	public String getKey() {
+		return key;
+	}	
 }
