@@ -26,6 +26,10 @@ import org.springframework.util.Assert;
  */
 public class RiakRestResponse implements RiakResponse<HttpHeaders> {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4613049362224120711L;
 	private ResponseEntity<byte[]> re;
 
 	public RiakRestResponse(ResponseEntity<byte[]> re) {

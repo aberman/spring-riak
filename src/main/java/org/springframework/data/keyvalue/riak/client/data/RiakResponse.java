@@ -15,13 +15,15 @@
  */
 package org.springframework.data.keyvalue.riak.client.data;
 
+import java.io.Serializable;
+
 import org.springframework.data.keyvalue.riak.util.RiakExtraInfo;
 
 /**
  * @author Andrew Berman
  * 
  */
-public interface RiakResponse<T extends RiakExtraInfo> {
+public interface RiakResponse<T extends RiakExtraInfo> extends Serializable {
 	byte[] getBytes();
 
 	T getExtraInfo();

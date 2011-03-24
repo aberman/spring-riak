@@ -16,48 +16,65 @@
 package org.springframework.data.keyvalue.riak.parameter;
 
 import org.codehaus.jackson.annotate.JsonProperty;
+import org.springframework.data.keyvalue.riak.client.data.RiakQuorumValue;
 
 /**
  * @author Andrew Berman
  * 
  */
 public class RiakStoreParameters extends RiakParameters {
-	private Integer read;
+	private RiakQuorumValue read;
 
-	private Integer write;
+	private RiakQuorumValue write;
 
-	private Integer durableWrite;
+	private RiakQuorumValue durableWrite;
 
 	private boolean returnBody;
 
+	public RiakStoreParameters() {
+
+	}
+
+	public RiakStoreParameters(RiakQuorumValue read, RiakQuorumValue write,
+			RiakQuorumValue durableWrite, boolean returnBody) {
+		super();
+		this.read = read;
+		this.write = write;
+		this.durableWrite = durableWrite;
+		this.returnBody = returnBody;
+	}
+
 	@JsonProperty("r")
-	public Integer getRead() {
+	public RiakQuorumValue getRead() {
 		return read;
 	}
 
 	@JsonProperty("r")
-	public void setRead(Integer read) {
+	public RiakStoreParameters setRead(RiakQuorumValue read) {
 		this.read = read;
+		return this;
 	}
 
 	@JsonProperty("w")
-	public Integer getWrite() {
+	public RiakQuorumValue getWrite() {
 		return write;
 	}
 
 	@JsonProperty("w")
-	public void setWrite(Integer write) {
+	public RiakStoreParameters setWrite(RiakQuorumValue write) {
 		this.write = write;
+		return this;
 	}
 
 	@JsonProperty("dw")
-	public Integer getDurableWrite() {
+	public RiakQuorumValue getDurableWrite() {
 		return durableWrite;
 	}
 
 	@JsonProperty("dw")
-	public void setDurableWrite(Integer durableWrite) {
+	public RiakStoreParameters setDurableWrite(RiakQuorumValue durableWrite) {
 		this.durableWrite = durableWrite;
+		return this;
 	}
 
 	@JsonProperty("returnbody")
@@ -66,8 +83,9 @@ public class RiakStoreParameters extends RiakParameters {
 	}
 
 	@JsonProperty("returnbody")
-	public void setReturnBody(boolean returnBody) {
+	public RiakStoreParameters setReturnBody(boolean returnBody) {
 		this.returnBody = returnBody;
+		return this;
 	}
 
 }

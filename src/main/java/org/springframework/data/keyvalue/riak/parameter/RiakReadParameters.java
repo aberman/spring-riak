@@ -16,13 +16,14 @@
 package org.springframework.data.keyvalue.riak.parameter;
 
 import org.codehaus.jackson.annotate.JsonProperty;
+import org.springframework.data.keyvalue.riak.client.data.RiakQuorumValue;
 
 /**
  * @author Andrew Berman
  * 
  */
 public class RiakReadParameters extends RiakParameters {
-	private Integer read;
+	private RiakQuorumValue read;
 
 	private String vtag;
 
@@ -31,7 +32,7 @@ public class RiakReadParameters extends RiakParameters {
 	}
 	
 	
-	public RiakReadParameters(Integer read, String vtag) {
+	public RiakReadParameters(RiakQuorumValue read, String vtag) {
 		super();
 		this.read = read;
 		this.vtag = vtag;
@@ -39,12 +40,12 @@ public class RiakReadParameters extends RiakParameters {
 
 
 	@JsonProperty("r")
-	public Integer getRead() {
+	public RiakQuorumValue getRead() {
 		return read;
 	}
 
 	@JsonProperty("r")
-	public RiakReadParameters setRead(Integer read) {
+	public RiakReadParameters setRead(RiakQuorumValue read) {
 		this.read = read;
 		return this;
 	}

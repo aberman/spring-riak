@@ -19,6 +19,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +28,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.data.keyvalue.riak.client.data.RiakBucket;
-import org.springframework.data.keyvalue.riak.client.data.RiakBucket.RiakBucketProperties;
+import org.springframework.data.keyvalue.riak.client.data.RiakBucketProperties;
 import org.springframework.data.keyvalue.riak.client.data.RiakRestResponse;
 import org.springframework.data.keyvalue.riak.mapreduce.RiakLinkPhase;
 import org.springframework.data.keyvalue.riak.mapreduce.RiakMapReduceJob;
@@ -38,6 +39,9 @@ import org.springframework.data.keyvalue.riak.parameter.RiakMapReduceParameters;
 import org.springframework.data.keyvalue.riak.parameter.RiakParameters;
 import org.springframework.data.keyvalue.riak.parameter.RiakReadParameters;
 import org.springframework.data.keyvalue.riak.parameter.RiakStoreParameters;
+import org.springframework.http.HttpStatus;
+import org.springframework.util.Assert;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
@@ -121,7 +125,10 @@ public class RiakRestClient implements RiakManager<RiakRestResponse> {
 			String... pathParams) {
 		List<String> params = new ArrayList<String>();
 		params.add(basePath);
-		params.addAll(Arrays.asList(pathParams));
+		
+		if (pathParams != null && pathParams.length > 0)
+			params.addAll(Arrays.asList(pathParams));
+		
 		return buildUrl(params, parameters);
 	}
 
@@ -171,11 +178,23 @@ public class RiakRestClient implements RiakManager<RiakRestResponse> {
 	}
 
 	@Override
+	public RiakBucket getBucketInformation(String bucket)
+			throws RiakClientException {
+		return getBucketInformation(bucket, null);
+	}
+
+	@Override
 	public void setBucketProperties(String bucket,
 			RiakBucketProperties bucketProperties) throws RiakClientException {
+		Assert.notNull(bucket, "The bucket cannot be null");
+		Assert.notNull(bucketProperties, "The bucket properties cannot be null");
+
+		Map<String, RiakBucketProperties> propMap = new HashMap<String, RiakBucketProperties>();
+		propMap.put("props", bucketProperties);
+
 		try {
-			restTemplate.put(getRiakUrl((RiakParameters) null, bucket),
-					bucketProperties);
+			restTemplate
+					.put(getRiakUrl((RiakParameters) null, bucket), propMap);
 		} catch (RestClientException e) {
 			throw new RiakClientException(e.getMessage(), e);
 		}
@@ -193,7 +212,11 @@ public class RiakRestClient implements RiakManager<RiakRestResponse> {
 			return new RiakRestResponse(restTemplate.getForEntity(
 					getRiakUrl(properties, bucket, key), byte[].class));
 		} catch (RestClientException e) {
-			throw new RiakClientException(e.getMessage(), e);
+			HttpClientErrorException ex = (HttpClientErrorException) e;
+			if (!ex.getStatusCode().equals(HttpStatus.NOT_FOUND))
+				throw new RiakClientException(e.getMessage(), e);
+
+			return null;
 		}
 	}
 
@@ -222,8 +245,8 @@ public class RiakRestClient implements RiakManager<RiakRestResponse> {
 	public String storeValue(String bucket, byte[] value,
 			RiakStoreParameters properties) throws RiakClientException {
 		try {
-			URI location = restTemplate.postForLocation(getRiakUrl(properties),
-					value, String.class, bucket);
+			URI location = restTemplate.postForLocation(
+					getRiakUrl(properties, bucket), value);
 			if (location != null) {
 				String[] split = StringUtils.split(location.getPath(), "/");
 				return split[split.length - 1];

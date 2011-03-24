@@ -16,21 +16,22 @@
 package org.springframework.data.keyvalue.riak.parameter;
 
 import org.codehaus.jackson.annotate.JsonProperty;
+import org.springframework.data.keyvalue.riak.client.data.RiakQuorumValue;
 
 /**
  * @author Andrew Berman
  * 
  */
 public class RiakDeleteParameters extends RiakParameters {
-	private Integer readWrite;
+	private RiakQuorumValue readWrite;
 
 	@JsonProperty("rw")
-	public Integer getReadWrite() {
+	public RiakQuorumValue getReadWrite() {
 		return readWrite;
 	}
 
 	@JsonProperty("rw")
-	public void setReadWrite(Integer readWrite) {
+	public void setReadWrite(RiakQuorumValue readWrite) {
 		this.readWrite = readWrite;
 	}
 

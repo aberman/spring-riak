@@ -19,7 +19,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.data.keyvalue.riak.client.data.RiakBucket;
-import org.springframework.data.keyvalue.riak.client.data.RiakBucket.RiakBucketProperties;
+import org.springframework.data.keyvalue.riak.client.data.RiakBucketProperties;
 import org.springframework.data.keyvalue.riak.client.data.RiakResponse;
 import org.springframework.data.keyvalue.riak.mapreduce.RiakLinkPhase;
 import org.springframework.data.keyvalue.riak.mapreduce.RiakMapReduceJob;
@@ -43,6 +43,8 @@ public interface RiakManager<T extends RiakResponse<? extends RiakExtraInfo>>
 
 	RiakBucket getBucketInformation(String bucket,
 			RiakBucketReadParameters properties) throws RiakClientException;
+
+	RiakBucket getBucketInformation(String bucket) throws RiakClientException;
 
 	void setBucketProperties(String bucket,
 			RiakBucketProperties bucketProperties) throws RiakClientException;
@@ -78,9 +80,10 @@ public interface RiakManager<T extends RiakResponse<? extends RiakExtraInfo>>
 
 	T executeMapReduceJob(RiakMapReduceJob job,
 			RiakMapReduceParameters parameters) throws RiakClientException;
-	
+
 	/*
 	 * Link Walking
 	 */
-	T walkLinks(String bucket, String key, RiakLinkPhase... phases) throws RiakClientException;
+	T walkLinks(String bucket, String key, RiakLinkPhase... phases)
+			throws RiakClientException;
 }
