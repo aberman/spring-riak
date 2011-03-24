@@ -15,11 +15,13 @@
  */
 package org.springframework.data.keyvalue.riak.client.data;
 
+import org.springframework.data.keyvalue.riak.util.RiakExtraInfo;
+
 /**
  * @author Andrew Berman
  * 
  */
-public interface RiakResponse<T> {
+public interface RiakResponse<T extends RiakExtraInfo> {
 	byte[] getBytes();
 
 	T getExtraInfo();

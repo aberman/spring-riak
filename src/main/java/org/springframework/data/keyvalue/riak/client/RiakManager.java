@@ -27,13 +27,14 @@ import org.springframework.data.keyvalue.riak.parameter.RiakDeleteParameters;
 import org.springframework.data.keyvalue.riak.parameter.RiakMapReduceParameters;
 import org.springframework.data.keyvalue.riak.parameter.RiakReadParameters;
 import org.springframework.data.keyvalue.riak.parameter.RiakStoreParameters;
+import org.springframework.data.keyvalue.riak.util.RiakExtraInfo;
 
 /**
  * @author Andrew Berman
  * 
  */
-public interface RiakManager<T extends RiakResponse<?>> extends
-		InitializingBean {
+public interface RiakManager<T extends RiakResponse<? extends RiakExtraInfo>>
+		extends InitializingBean {
 	/*
 	 * Bucket operations
 	 */
