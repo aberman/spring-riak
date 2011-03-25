@@ -18,16 +18,12 @@ package org.springframework.data.keyvalue.riak.client;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 
-import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.data.keyvalue.riak.client.data.RiakBucket;
 import org.springframework.data.keyvalue.riak.client.data.RiakBucketProperties;
 import org.springframework.data.keyvalue.riak.client.data.RiakQuorumValue;
-import org.springframework.data.keyvalue.riak.client.data.RiakRestResponse;
-import org.springframework.data.keyvalue.riak.mapreduce.RiakJavascriptMapReduceFunction.RiakJavascriptNamedFunction;
-import org.springframework.data.keyvalue.riak.mapreduce.RiakMapReduceJob;
-import org.springframework.data.keyvalue.riak.mapreduce.filter.RiakMapReduceRestrictions;
-import org.springframework.data.keyvalue.riak.parameter.RiakBucketReadParameters;
-import org.springframework.data.keyvalue.riak.parameter.RiakBucketReadParameters.KeyRetrievalType;
+import org.springframework.data.keyvalue.riak.client.data.RiakResponse;
+import org.springframework.data.keyvalue.riak.parameter.RiakBucketReadParameter;
+import org.springframework.data.keyvalue.riak.parameter.RiakBucketReadParameter.KeyRetrievalType;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -39,7 +35,7 @@ import org.testng.annotations.Test;
  */
 public class RiakRestClientTests {
 
-	private static RiakManager<RiakRestResponse> restClient;
+	private static RiakManager restClient;
 
 	public static final String TEST_BUCKET = "RiakRestClientTests.bucket4";
 
@@ -49,15 +45,18 @@ public class RiakRestClientTests {
 
 	@BeforeClass
 	public static void setUp() {
-		restClient = new RiakRestClient("localhost", 8099, false);
-		TEST_KEY = restClient.storeValue(TEST_BUCKET, TEST_VALUE.getBytes());
+		restClient = new RiakRestClient("localhost", 8098, false);
+		TEST_KEY = restClient.storeValue(TEST_BUCKET, TEST_VALUE);
 	}
 
 	@AfterClass
 	public static void tearDown() {
-		for (String key : restClient.getBucketInformation(TEST_BUCKET,
-				new RiakBucketReadParameters(false, KeyRetrievalType.TRUE))
-				.getKeys())
+		for (String key : restClient
+				.getBucketInformation(
+						TEST_BUCKET,
+						RiakBucketReadParameter
+								.keyRetrievalType(KeyRetrievalType.TRUE),
+						RiakBucketReadParameter.showProperties(true)).getKeys())
 			restClient.deleteKey(TEST_BUCKET, key);
 	}
 
@@ -71,8 +70,10 @@ public class RiakRestClientTests {
 
 	@Test(groups = { "bucket", "read" })
 	public void getBucketInformationTest() {
-		RiakBucket bucket = restClient.getBucketInformation(TEST_BUCKET,
-				new RiakBucketReadParameters(true, KeyRetrievalType.TRUE));
+		RiakBucket bucket = restClient
+				.getBucketInformation(TEST_BUCKET, RiakBucketReadParameter
+						.showProperties(true), RiakBucketReadParameter
+						.keyRetrievalType(KeyRetrievalType.TRUE));
 		assertNotNull(bucket);
 		assertNotNull(bucket.getBucketProperties());
 		assertNotNull(bucket.getKeys());
@@ -80,8 +81,8 @@ public class RiakRestClientTests {
 
 	@Test(groups = { "bucket", "write" })
 	public void setBucketInformationTest() {
-		restClient.setBucketProperties(TEST_BUCKET, new RiakBucketProperties()
-				.setWriteOperation(RiakQuorumValue.ALL));
+		restClient.setBucketProperties(TEST_BUCKET, RiakBucketProperties
+				.getInstance().setWriteOperation(RiakQuorumValue.ALL));
 		RiakBucket bucket = restClient.getBucketInformation(TEST_BUCKET);
 		assertEquals(bucket.getBucketProperties().getWriteOperation(),
 				RiakQuorumValue.ALL);
@@ -92,50 +93,61 @@ public class RiakRestClientTests {
 	 */
 	@Test(groups = { "keyValue", "read" })
 	public void getValueTest() {
-		RiakRestResponse response = restClient.getValue(TEST_BUCKET, TEST_KEY);
+		RiakResponse<String> response = restClient.getValue(TEST_BUCKET,
+				TEST_KEY, String.class);
 		assertNotNull(response);
-		assertEquals(new String(response.getBytes()), TEST_VALUE);
+		assertEquals(response.getData(), TEST_VALUE);
 	}
 
 	@Test(groups = { "keyValue", "write" })
 	public void storeKeyValueTest() {
-		restClient.storeKeyValue(TEST_BUCKET, TEST_KEY, "foo test".getBytes());
-		RiakRestResponse response = restClient.getValue(TEST_BUCKET, TEST_KEY);
+		restClient.storeKeyValue(TEST_BUCKET, TEST_KEY, "foo test");
+		RiakResponse<String> response = restClient.getValue(TEST_BUCKET,
+				TEST_KEY, String.class);
 		assertNotNull(response);
-		assertEquals(new String(response.getBytes()), "foo test");
+		assertEquals(response.getData(), "foo test");
 	}
 
 	@Test(groups = { "keyValue", "write" })
 	public void storeValueTest() {
-		String key = restClient.storeValue(TEST_BUCKET, "bar test".getBytes());
-		RiakRestResponse response = restClient.getValue(TEST_BUCKET, key);
+		String key = restClient.storeValue(TEST_BUCKET, "bar test");
+		RiakResponse<String> response = restClient.getValue(TEST_BUCKET, key,
+				String.class);
 		assertNotNull(response);
-		assertEquals(new String(response.getBytes()), "bar test");
+		assertEquals(response.getData(), "bar test");
 	}
 
 	@Test(groups = { "keyValue", "delete" })
 	public void deleteKeyTest() {
-		String key = restClient.storeValue(TEST_BUCKET, "foo".getBytes());
-		RiakRestResponse response = restClient.getValue(TEST_BUCKET, key);
-		assertNotNull(response.getBytes());
+		String key = restClient.storeValue(TEST_BUCKET, "foo");
+		RiakResponse<String> response = restClient.getValue(TEST_BUCKET, key,
+				String.class);
+		assertNotNull(response.getData());
 		restClient.deleteKey(TEST_BUCKET, key);
-		response = restClient.getValue(TEST_BUCKET, key);
+		response = restClient.getValue(TEST_BUCKET, key, String.class);
 		Assert.assertNull(response);
 	}
 
 	/*
 	 * Map/Reduce Test
 	 */
-	@Test
 	public void mapReduceKeyFilterTest() throws Exception {
-		RiakRestResponse response = restClient
-				.executeMapReduceJob(new RiakMapReduceJob(TEST_BUCKET,
-						RiakMapReduceRestrictions.eq(TEST_KEY))
-						.addMap(RiakJavascriptNamedFunction.MAP_VALUES));
-		assertNotNull(response);
-		ObjectMapper mapper = new ObjectMapper();
-		assertEquals(mapper.readValue(response.getBytes(), 0,
-				response.getBytes().length, String[].class)[0], TEST_VALUE);
+//		RiakResponse response = restClient
+//				.executeMapReduceJob(new RiakMapReduceJob(TEST_BUCKET,
+//						RiakMapReduceRestrictions.eq(TEST_KEY)).addMap(
+//						RiakJavascriptNamedFunction.MAP_VALUES).addReduce(
+//						RiakJavascriptNamedFunction.REDUCE_SORT));
+//		assertNotNull(response);
+//
+//		restClient.executeMapReduceJob(job, new ResultCallbackHandler<Long>() {
+//
+//			@Override
+//			public void processResult(RiakResponse<Long> response) {
+//				// TODO Auto-generated method stub
+//
+//			}
+//
+//		});
 
 	}
 }

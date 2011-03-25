@@ -15,10 +15,12 @@
  */
 package org.springframework.data.keyvalue.riak.util;
 
+import java.util.Map;
+
 /**
  * @author Andrew Berman
  *
  */
 public interface RiakExtraInfo {
-
+	Map<String, String> getInfo();
 }

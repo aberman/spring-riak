@@ -15,24 +15,38 @@
  */
 package org.springframework.data.keyvalue.riak.parameter;
 
-import org.codehaus.jackson.annotate.JsonProperty;
 import org.springframework.data.keyvalue.riak.client.data.RiakQuorumValue;
 
 /**
  * @author Andrew Berman
  * 
  */
-public class RiakDeleteParameters extends RiakParameters {
-	private RiakQuorumValue readWrite;
+public class RiakStoreParameter extends RiakParameter {
 
-	@JsonProperty("rw")
-	public RiakQuorumValue getReadWrite() {
-		return readWrite;
+	/**
+	 * @param key
+	 * @param value
+	 */
+	private RiakStoreParameter(String key, String value) {
+		super(key, value);
 	}
 
-	@JsonProperty("rw")
-	public void setReadWrite(RiakQuorumValue readWrite) {
-		this.readWrite = readWrite;
+	public static final RiakStoreParameter read(RiakQuorumValue read) {
+		return new RiakStoreParameter("r", read.toString());
+	}
+
+	public static final RiakStoreParameter write(RiakQuorumValue write) {
+		return new RiakStoreParameter("w", write.toString());
+	}
+
+	public static final RiakStoreParameter durableWrite(
+			RiakQuorumValue durableWrite) {
+		return new RiakStoreParameter("dw", durableWrite.toString());
+	}
+
+	public static final RiakStoreParameter shouldReturnBody(boolean returnBody) {
+		return new RiakStoreParameter("returnbody",
+				Boolean.toString(returnBody));
 	}
 
 }

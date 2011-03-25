@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite hostname="new-host.home" name="org.springframework.data.keyvalue.riak.client.RiakRestClientTests" tests="7" failures="0" timestamp="25 Mar 2011 22:25:39 GMT" time="11.23" errors="0">
+  <testcase name="deleteKeyTest" time="0.215" classname="org.springframework.data.keyvalue.riak.client.RiakRestClientTests"/>
+  <testcase name="getBucketInformationTest" time="3.943" classname="org.springframework.data.keyvalue.riak.client.RiakRestClientTests"/>
+  <testcase name="getValueTest" time="0.296" classname="org.springframework.data.keyvalue.riak.client.RiakRestClientTests"/>
+  <testcase name="listBucketsTest" time="1.468" classname="org.springframework.data.keyvalue.riak.client.RiakRestClientTests"/>
+  <testcase name="setBucketInformationTest" time="0.453" classname="org.springframework.data.keyvalue.riak.client.RiakRestClientTests"/>
+  <testcase name="storeKeyValueTest" time="1.479" classname="org.springframework.data.keyvalue.riak.client.RiakRestClientTests"/>
+  <testcase name="storeValueTest" time="1.477" classname="org.springframework.data.keyvalue.riak.client.RiakRestClientTests"/>
+</testsuite>

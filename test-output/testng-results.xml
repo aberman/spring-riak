@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testng-results skipped="0" failed="0" total="7" passed="7">
+  <reporter-output>
+  </reporter-output>
+  <suite name="Default suite" duration-ms="11230" started-at="2011-03-25T15:25:28Z" finished-at="2011-03-25T15:25:39Z">
+    <groups>
+      <group name="bucket">
+        <method signature="org.springframework.data.keyvalue.riak.client.RiakRestClientTests.getBucketInformationTest()" name="getBucketInformationTest" class="org.springframework.data.keyvalue.riak.client.RiakRestClientTests"/>
+        <method signature="org.springframework.data.keyvalue.riak.client.RiakRestClientTests.listBucketsTest()" name="listBucketsTest" class="org.springframework.data.keyvalue.riak.client.RiakRestClientTests"/>
+        <method signature="org.springframework.data.keyvalue.riak.client.RiakRestClientTests.setBucketInformationTest()" name="setBucketInformationTest" class="org.springframework.data.keyvalue.riak.client.RiakRestClientTests"/>
+      </group>
+      <group name="write">
+        <method signature="org.springframework.data.keyvalue.riak.client.RiakRestClientTests.setBucketInformationTest()" name="setBucketInformationTest" class="org.springframework.data.keyvalue.riak.client.RiakRestClientTests"/>
+        <method signature="org.springframework.data.keyvalue.riak.client.RiakRestClientTests.storeKeyValueTest()" name="storeKeyValueTest" class="org.springframework.data.keyvalue.riak.client.RiakRestClientTests"/>
+        <method signature="org.springframework.data.keyvalue.riak.client.RiakRestClientTests.storeValueTest()" name="storeValueTest" class="org.springframework.data.keyvalue.riak.client.RiakRestClientTests"/>
+      </group>
+      <group name="delete">
+        <method signature="org.springframework.data.keyvalue.riak.client.RiakRestClientTests.deleteKeyTest()" name="deleteKeyTest" class="org.springframework.data.keyvalue.riak.client.RiakRestClientTests"/>
+      </group>
+      <group name="read">
+        <method signature="org.springframework.data.keyvalue.riak.client.RiakRestClientTests.getBucketInformationTest()" name="getBucketInformationTest" class="org.springframework.data.keyvalue.riak.client.RiakRestClientTests"/>
+        <method signature="org.springframework.data.keyvalue.riak.client.RiakRestClientTests.getValueTest()" name="getValueTest" class="org.springframework.data.keyvalue.riak.client.RiakRestClientTests"/>
+        <method signature="org.springframework.data.keyvalue.riak.client.RiakRestClientTests.listBucketsTest()" name="listBucketsTest" class="org.springframework.data.keyvalue.riak.client.RiakRestClientTests"/>
+      </group>
+      <group name="keyValue">
+        <method signature="org.springframework.data.keyvalue.riak.client.RiakRestClientTests.deleteKeyTest()" name="deleteKeyTest" class="org.springframework.data.keyvalue.riak.client.RiakRestClientTests"/>
+        <method signature="org.springframework.data.keyvalue.riak.client.RiakRestClientTests.getValueTest()" name="getValueTest" class="org.springframework.data.keyvalue.riak.client.RiakRestClientTests"/>
+        <method signature="org.springframework.data.keyvalue.riak.client.RiakRestClientTests.storeKeyValueTest()" name="storeKeyValueTest" class="org.springframework.data.keyvalue.riak.client.RiakRestClientTests"/>
+        <method signature="org.springframework.data.keyvalue.riak.client.RiakRestClientTests.storeValueTest()" name="storeValueTest" class="org.springframework.data.keyvalue.riak.client.RiakRestClientTests"/>
+      </group>
+    </groups>
+    <test name="Default test" duration-ms="11230" started-at="2011-03-25T15:25:28Z" finished-at="2011-03-25T15:25:39Z">
+      <class name="org.springframework.data.keyvalue.riak.client.RiakRestClientTests">
+        <test-method status="PASS" signature="setUp()" name="setUp" is-config="true" duration-ms="1016" started-at="2011-03-25T15:25:28Z" finished-at="2011-03-25T15:25:29Z">
+        </test-method>
+        <test-method status="PASS" signature="deleteKeyTest()" name="deleteKeyTest" duration-ms="215" started-at="2011-03-25T15:25:29Z" finished-at="2011-03-25T15:25:29Z">
+        </test-method>
+        <test-method status="PASS" signature="getBucketInformationTest()" name="getBucketInformationTest" duration-ms="3943" started-at="2011-03-25T15:25:29Z" finished-at="2011-03-25T15:25:33Z">
+        </test-method>
+        <test-method status="PASS" signature="getValueTest()" name="getValueTest" duration-ms="296" started-at="2011-03-25T15:25:33Z" finished-at="2011-03-25T15:25:33Z">
+        </test-method>
+        <test-method status="PASS" signature="listBucketsTest()" name="listBucketsTest" duration-ms="1468" started-at="2011-03-25T15:25:33Z" finished-at="2011-03-25T15:25:35Z">
+        </test-method>
+        <test-method status="PASS" signature="setBucketInformationTest()" name="setBucketInformationTest" duration-ms="453" started-at="2011-03-25T15:25:35Z" finished-at="2011-03-25T15:25:35Z">
+        </test-method>
+        <test-method status="PASS" signature="storeKeyValueTest()" name="storeKeyValueTest" duration-ms="1479" started-at="2011-03-25T15:25:35Z" finished-at="2011-03-25T15:25:36Z">
+        </test-method>
+        <test-method status="PASS" signature="storeValueTest()" name="storeValueTest" duration-ms="1477" started-at="2011-03-25T15:25:36Z" finished-at="2011-03-25T15:25:38Z">
+        </test-method>
+        <test-method status="PASS" signature="tearDown()" name="tearDown" is-config="true" duration-ms="798" started-at="2011-03-25T15:25:38Z" finished-at="2011-03-25T15:25:39Z">
+        </test-method>
+      </class>
+    </test>
+  </suite>
+</testng-results>

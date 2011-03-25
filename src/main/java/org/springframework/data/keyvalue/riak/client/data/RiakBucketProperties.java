@@ -25,7 +25,6 @@ import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 
 @JsonSerialize(include = Inclusion.NON_NULL)
 public class RiakBucketProperties implements Serializable {
-	
 
 	/**
 	 * 
@@ -64,15 +63,18 @@ public class RiakBucketProperties implements Serializable {
 
 	private RiakQuorumValue readWriteOperation;
 
-	public RiakBucketProperties() {
+	protected RiakBucketProperties() {
 
 	}
 
-	public RiakBucketProperties(String name, String nVal,
-			Boolean allowMult, Boolean lastWriteWins, String[] preCommit,
-			String[] postCommit, Map<String, String> chashKeyFun,
-			Map<String, String> linkFun, Long oldVClock, Long youngVClock,
-			Long bigVClock, Long smallVClock,
+	public static final RiakBucketProperties getInstance() {
+		return new RiakBucketProperties();
+	}
+
+	public RiakBucketProperties(String name, String nVal, Boolean allowMult,
+			Boolean lastWriteWins, String[] preCommit, String[] postCommit,
+			Map<String, String> chashKeyFun, Map<String, String> linkFun,
+			Long oldVClock, Long youngVClock, Long bigVClock, Long smallVClock,
 			RiakQuorumValue readOperation, RiakQuorumValue writeOperation,
 			RiakQuorumValue durableWriteOperation,
 			RiakQuorumValue readWriteOperation) {
@@ -164,8 +166,7 @@ public class RiakBucketProperties implements Serializable {
 	}
 
 	@JsonProperty("chash_keyfun")
-	public RiakBucketProperties setChashKeyFun(
-			Map<String, String> chashKeyFun) {
+	public RiakBucketProperties setChashKeyFun(Map<String, String> chashKeyFun) {
 		this.chashKeyFun = chashKeyFun;
 		return this;
 	}
@@ -231,8 +232,7 @@ public class RiakBucketProperties implements Serializable {
 	}
 
 	@JsonProperty("r")
-	public RiakBucketProperties setReadOperation(
-			RiakQuorumValue readOperation) {
+	public RiakBucketProperties setReadOperation(RiakQuorumValue readOperation) {
 		this.readOperation = readOperation;
 		return this;
 	}
@@ -243,8 +243,7 @@ public class RiakBucketProperties implements Serializable {
 	}
 
 	@JsonProperty("w")
-	public RiakBucketProperties setWriteOperation(
-			RiakQuorumValue writeOperation) {
+	public RiakBucketProperties setWriteOperation(RiakQuorumValue writeOperation) {
 		this.writeOperation = writeOperation;
 		return this;
 	}

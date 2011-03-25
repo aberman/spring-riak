@@ -13,14 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.keyvalue.riak.util;
-
-import org.springframework.http.HttpHeaders;
+package org.springframework.data.keyvalue.riak.client.data;
 
 /**
- * @author Andrew Berman
+ * @author andrewberman
  *
  */
-public class HttpStatus extends HttpHeaders implements RiakExtraInfo {
-
+public interface ResultCallbackHandler {
+	void processResult(RiakResponse<?> response);
 }

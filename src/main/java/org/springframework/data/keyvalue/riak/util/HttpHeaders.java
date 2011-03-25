@@ -15,11 +15,18 @@
  */
 package org.springframework.data.keyvalue.riak.util;
 
+import java.util.Map;
+
 /**
  * @author Andrew Berman
  * 
  */
 public class HttpHeaders extends org.springframework.http.HttpHeaders implements
 		RiakExtraInfo {
+
+	@Override
+	public Map<String, String> getInfo() {
+		return this.toSingleValueMap();
+	}
 
 }

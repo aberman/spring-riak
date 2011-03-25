@@ -18,33 +18,30 @@ package org.springframework.data.keyvalue.riak.client;
 import java.util.List;
 
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.data.keyvalue.riak.client.data.ResultCallbackHandler;
 import org.springframework.data.keyvalue.riak.client.data.RiakBucket;
 import org.springframework.data.keyvalue.riak.client.data.RiakBucketProperties;
 import org.springframework.data.keyvalue.riak.client.data.RiakResponse;
 import org.springframework.data.keyvalue.riak.mapreduce.RiakLinkPhase;
 import org.springframework.data.keyvalue.riak.mapreduce.RiakMapReduceJob;
-import org.springframework.data.keyvalue.riak.parameter.RiakBucketReadParameters;
-import org.springframework.data.keyvalue.riak.parameter.RiakDeleteParameters;
-import org.springframework.data.keyvalue.riak.parameter.RiakMapReduceParameters;
-import org.springframework.data.keyvalue.riak.parameter.RiakReadParameters;
-import org.springframework.data.keyvalue.riak.parameter.RiakStoreParameters;
-import org.springframework.data.keyvalue.riak.util.RiakExtraInfo;
+import org.springframework.data.keyvalue.riak.parameter.RiakBucketReadParameter;
+import org.springframework.data.keyvalue.riak.parameter.RiakDeleteParameter;
+import org.springframework.data.keyvalue.riak.parameter.RiakMapReduceParameter;
+import org.springframework.data.keyvalue.riak.parameter.RiakReadParameter;
+import org.springframework.data.keyvalue.riak.parameter.RiakStoreParameter;
 
 /**
  * @author Andrew Berman
  * 
  */
-public interface RiakManager<T extends RiakResponse<? extends RiakExtraInfo>>
-		extends InitializingBean {
+public interface RiakManager extends InitializingBean {
 	/*
 	 * Bucket operations
 	 */
 	List<String> listBuckets() throws RiakClientException;
 
 	RiakBucket getBucketInformation(String bucket,
-			RiakBucketReadParameters properties) throws RiakClientException;
-
-	RiakBucket getBucketInformation(String bucket) throws RiakClientException;
+			RiakBucketReadParameter... params) throws RiakClientException;
 
 	void setBucketProperties(String bucket,
 			RiakBucketProperties bucketProperties) throws RiakClientException;
@@ -52,38 +49,32 @@ public interface RiakManager<T extends RiakResponse<? extends RiakExtraInfo>>
 	/*
 	 * Key/Value operations
 	 */
-	T getValue(String bucket, String key) throws RiakClientException;
+	<T> RiakResponse<T> getValue(String bucket, String key, Class<T> clazz,
+			RiakReadParameter... params) throws RiakClientException;
 
-	T getValue(String bucket, String key, RiakReadParameters properties)
+	void storeKeyValue(String bucket, String key, Object value,
+			RiakStoreParameter... params) throws RiakClientException;
+
+	String storeValue(String bucket, Object value, RiakStoreParameter... params)
 			throws RiakClientException;
 
-	void storeKeyValue(String bucket, String key, byte[] value)
-			throws RiakClientException;
-
-	String storeValue(String bucket, byte[] value) throws RiakClientException;
-
-	void storeKeyValue(String bucket, String key, byte[] value,
-			RiakStoreParameters properties) throws RiakClientException;
-
-	String storeValue(String bucket, byte[] value,
-			RiakStoreParameters properties) throws RiakClientException;
-
-	void deleteKey(String bucket, String key) throws RiakClientException;
-
-	void deleteKey(String bucket, String key, RiakDeleteParameters properties)
+	void deleteKey(String bucket, String key, RiakDeleteParameter... params)
 			throws RiakClientException;
 
 	/*
 	 * Map/Reduce operations
 	 */
-	T executeMapReduceJob(RiakMapReduceJob job) throws RiakClientException;
+	<T> RiakResponse<T> executeMapReduceJob(RiakMapReduceJob job,
+			Class<T> clazz, RiakMapReduceParameter... params)
+			throws RiakClientException;
 
-	T executeMapReduceJob(RiakMapReduceJob job,
-			RiakMapReduceParameters parameters) throws RiakClientException;
+	void executeMapReduceJob(RiakMapReduceJob job,
+			ResultCallbackHandler callback, RiakMapReduceParameter... params)
+			throws RiakClientException;
 
 	/*
 	 * Link Walking
 	 */
-	T walkLinks(String bucket, String key, RiakLinkPhase... phases)
-			throws RiakClientException;
+	<T> RiakResponse<T> walkLinks(String bucket, String key, Class<T> clazz,
+			RiakLinkPhase... phases) throws RiakClientException;
 }

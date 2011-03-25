@@ -15,19 +15,23 @@
  */
 package org.springframework.data.keyvalue.riak.parameter;
 
+import org.springframework.data.keyvalue.riak.client.data.RiakQuorumValue;
+
 /**
  * @author Andrew Berman
  * 
  */
-public class RiakBucketListParameters extends RiakParameters {
-	private boolean buckets = true;
+public class RiakDeleteParameter extends RiakParameter {
 
-	public boolean isBuckets() {
-		return buckets;
+	/**
+	 * @param key
+	 * @param value
+	 */
+	private RiakDeleteParameter(String key, String value) {
+		super(key, value);
 	}
 
-	public void setBucket(boolean buckets) {
-		this.buckets = buckets;
+	public static final RiakDeleteParameter readWrite(RiakQuorumValue val) {
+		return new RiakDeleteParameter("rw", val.toString());
 	}
-
 }

@@ -24,21 +24,21 @@ import org.springframework.util.Assert;
  * @author Andrew Berman
  * 
  */
-public class RiakRestResponse implements RiakResponse<HttpHeaders> {
+public class RiakRestResponse<T> implements RiakResponse<T> {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -4613049362224120711L;
-	private ResponseEntity<byte[]> re;
+	private ResponseEntity<T> re;
 
-	public RiakRestResponse(ResponseEntity<byte[]> re) {
+	public RiakRestResponse(ResponseEntity<T> re) {
 		Assert.notNull(re, "ResponseEntity cannot be null");
 		this.re = re;
 	}
 
 	@Override
-	public byte[] getBytes() {
+	public T getData() {
 		return re.getBody();
 	}
 

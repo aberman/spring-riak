@@ -27,19 +27,26 @@ import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.type.TypeFactory;
+import org.codehaus.jackson.node.ArrayNode;
+import org.codehaus.jackson.type.JavaType;
+import org.springframework.data.keyvalue.riak.client.data.ResultCallbackHandler;
 import org.springframework.data.keyvalue.riak.client.data.RiakBucket;
 import org.springframework.data.keyvalue.riak.client.data.RiakBucketProperties;
+import org.springframework.data.keyvalue.riak.client.data.RiakResponse;
 import org.springframework.data.keyvalue.riak.client.data.RiakRestResponse;
 import org.springframework.data.keyvalue.riak.mapreduce.RiakLinkPhase;
 import org.springframework.data.keyvalue.riak.mapreduce.RiakMapReduceJob;
-import org.springframework.data.keyvalue.riak.parameter.RiakBucketListParameters;
-import org.springframework.data.keyvalue.riak.parameter.RiakBucketReadParameters;
-import org.springframework.data.keyvalue.riak.parameter.RiakDeleteParameters;
-import org.springframework.data.keyvalue.riak.parameter.RiakMapReduceParameters;
-import org.springframework.data.keyvalue.riak.parameter.RiakParameters;
-import org.springframework.data.keyvalue.riak.parameter.RiakReadParameters;
-import org.springframework.data.keyvalue.riak.parameter.RiakStoreParameters;
+import org.springframework.data.keyvalue.riak.parameter.RiakBucketReadParameter;
+import org.springframework.data.keyvalue.riak.parameter.RiakDeleteParameter;
+import org.springframework.data.keyvalue.riak.parameter.RiakMapReduceParameter;
+import org.springframework.data.keyvalue.riak.parameter.RiakParameter;
+import org.springframework.data.keyvalue.riak.parameter.RiakReadParameter;
+import org.springframework.data.keyvalue.riak.parameter.RiakStoreParameter;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
@@ -49,7 +56,7 @@ import org.springframework.web.client.RestTemplate;
  * @author Andrew Berman
  * 
  */
-public class RiakRestClient implements RiakManager<RiakRestResponse> {
+public class RiakRestClient implements RiakManager {
 
 	private Log logger = LogFactory.getLog(getClass());
 
@@ -108,12 +115,12 @@ public class RiakRestClient implements RiakManager<RiakRestResponse> {
 		this.port = port;
 	}
 
-	private String buildUrl(List<String> path, RiakParameters queryParams) {
+	private String buildUrl(List<String> path, RiakParameter[] queryParams) {
 		try {
 			return new URI(isUseSSL() ? "https" : "http", null, this.host,
 					this.port, "/" + StringUtils.join(path, "/"),
-					queryParams != null ? queryParams.toQueryString() : null,
-					null).toString();
+					queryParams != null ? StringUtils.join(queryParams, "&")
+							: null, null).toString();
 		} catch (URISyntaxException e) {
 			// should never happen
 			logger.fatal("Error formatting the URI");
@@ -121,18 +128,18 @@ public class RiakRestClient implements RiakManager<RiakRestResponse> {
 		}
 	}
 
-	private String getUrl(String basePath, RiakParameters parameters,
-			String... pathParams) {
+	private String getUrl(String basePath, RiakParameter[] parameters,
+			String[] pathParams) {
 		List<String> params = new ArrayList<String>();
 		params.add(basePath);
-		
+
 		if (pathParams != null && pathParams.length > 0)
 			params.addAll(Arrays.asList(pathParams));
-		
+
 		return buildUrl(params, parameters);
 	}
 
-	private String getRiakUrl(RiakParameters parameters, String... pathParams) {
+	private String getRiakUrl(RiakParameter[] parameters, String... pathParams) {
 		return getUrl("riak", parameters, pathParams);
 	}
 
@@ -140,16 +147,15 @@ public class RiakRestClient implements RiakManager<RiakRestResponse> {
 		return getRiakUrl(null, pathParams);
 	}
 
-	private String getMapReduceUrl(RiakParameters parameters,
-			String... pathParams) {
-		return getUrl("mapred", parameters, pathParams);
+	private String getMapReduceUrl(RiakParameter[] params, String... pathParams) {
+		return getUrl("mapred", params, pathParams);
 	}
 
 	@Override
 	public List<String> listBuckets() throws RiakClientException {
 		try {
 			Map<?, ?> map = restTemplate.getForObject(
-					getRiakUrl(new RiakBucketListParameters()), Map.class);
+					getRiakUrl().concat("?buckets=true"), Map.class);
 
 			if (map != null && !map.isEmpty()) {
 				List<?> buckets = (List<?>) map.get("buckets");
@@ -168,19 +174,13 @@ public class RiakRestClient implements RiakManager<RiakRestResponse> {
 
 	@Override
 	public RiakBucket getBucketInformation(String bucket,
-			RiakBucketReadParameters properties) throws RiakClientException {
+			RiakBucketReadParameter... params) throws RiakClientException {
 		try {
-			return restTemplate.getForObject(getRiakUrl(properties, bucket)
+			return restTemplate.getForObject(getRiakUrl(params, bucket)
 					.toString(), RiakBucket.class);
 		} catch (RestClientException e) {
 			throw new RiakClientException(e.getMessage(), e);
 		}
-	}
-
-	@Override
-	public RiakBucket getBucketInformation(String bucket)
-			throws RiakClientException {
-		return getBucketInformation(bucket, null);
 	}
 
 	@Override
@@ -193,24 +193,20 @@ public class RiakRestClient implements RiakManager<RiakRestResponse> {
 		propMap.put("props", bucketProperties);
 
 		try {
-			restTemplate
-					.put(getRiakUrl((RiakParameters) null, bucket), propMap);
+			restTemplate.put(getRiakUrl((RiakParameter[]) null, bucket),
+					propMap);
 		} catch (RestClientException e) {
 			throw new RiakClientException(e.getMessage(), e);
 		}
 	}
 
 	@Override
-	public RiakRestResponse getValue(String bucket, String key) {
-		return getValue(bucket, key, null);
-	}
-
-	@Override
-	public RiakRestResponse getValue(String bucket, String key,
-			RiakReadParameters properties) throws RiakClientException {
+	public <T> RiakResponse<T> getValue(String bucket, String key,
+			Class<T> clazz, RiakReadParameter... params)
+			throws RiakClientException {
 		try {
-			return new RiakRestResponse(restTemplate.getForEntity(
-					getRiakUrl(properties, bucket, key), byte[].class));
+			return new RiakRestResponse<T>(restTemplate.getForEntity(
+					getRiakUrl(params, bucket, key), clazz));
 		} catch (RestClientException e) {
 			HttpClientErrorException ex = (HttpClientErrorException) e;
 			if (!ex.getStatusCode().equals(HttpStatus.NOT_FOUND))
@@ -221,32 +217,21 @@ public class RiakRestClient implements RiakManager<RiakRestResponse> {
 	}
 
 	@Override
-	public void storeKeyValue(String bucket, String key, byte[] value) {
-		storeKeyValue(bucket, key, value, null);
-	}
-
-	@Override
-	public String storeValue(String bucket, byte[] value) {
-		return storeValue(bucket, value, null);
-	}
-
-	@Override
-	public void storeKeyValue(String bucket, String key, byte[] value,
-			RiakStoreParameters properties) throws RiakClientException {
+	public void storeKeyValue(String bucket, String key, Object value,
+			RiakStoreParameter... params) throws RiakClientException {
 		try {
-			restTemplate.put(getRiakUrl((RiakParameters) null, bucket, key),
-					value);
+			restTemplate.put(getRiakUrl(params, bucket, key), value);
 		} catch (RestClientException e) {
 			throw new RiakClientException(e.getMessage(), e);
 		}
 	}
 
 	@Override
-	public String storeValue(String bucket, byte[] value,
-			RiakStoreParameters properties) throws RiakClientException {
+	public String storeValue(String bucket, Object value,
+			RiakStoreParameter... params) throws RiakClientException {
 		try {
 			URI location = restTemplate.postForLocation(
-					getRiakUrl(properties, bucket), value);
+					getRiakUrl(params, bucket), value);
 			if (location != null) {
 				String[] split = StringUtils.split(location.getPath(), "/");
 				return split[split.length - 1];
@@ -259,48 +244,50 @@ public class RiakRestClient implements RiakManager<RiakRestResponse> {
 	}
 
 	@Override
-	public void deleteKey(String bucket, String key) {
-		deleteKey(bucket, key, null);
-	}
-
-	@Override
 	public void deleteKey(String bucket, String key,
-			RiakDeleteParameters properties) throws RiakClientException {
+			RiakDeleteParameter... params) throws RiakClientException {
 		try {
 			restTemplate.delete(getRiakUrl(bucket, key));
 		} catch (RestClientException e) {
 			throw new RiakClientException(e.getMessage(), e);
 		}
+
 	}
 
 	@Override
-	public RiakRestResponse executeMapReduceJob(RiakMapReduceJob job)
+	public <T> RiakResponse<T> executeMapReduceJob(RiakMapReduceJob job,
+			Class<T> clazz, RiakMapReduceParameter... params)
 			throws RiakClientException {
-		return executeMapReduceJob(job, null);
+		ResponseEntity<ArrayNode> list = restTemplate.postForEntity(
+				getMapReduceUrl(params), job, ArrayNode.class);
+
+		for (Iterator<JsonNode> i = list.getBody().getElements(); i.hasNext();) {
+			JsonNode node = (JsonNode) i;
+
+		}
+		return new RiakRestResponse<T>(null);
 	}
 
 	@Override
-	public RiakRestResponse executeMapReduceJob(RiakMapReduceJob job,
-			RiakMapReduceParameters parameters) throws RiakClientException {
-		return new RiakRestResponse(
-				restTemplate.postForEntity(
-						getMapReduceUrl(parameters, (String[]) null), job,
-						byte[].class));
+	public void executeMapReduceJob(RiakMapReduceJob job,
+			ResultCallbackHandler callback, RiakMapReduceParameter... params)
+			throws RiakClientException {
+		// TODO Auto-generated method stub
+
 	}
 
 	@Override
-	public RiakRestResponse walkLinks(String bucket, String key,
-			RiakLinkPhase... phases) throws RiakClientException {
-
+	public <T> RiakResponse<T> walkLinks(String bucket, String key,
+			Class<T> clazz, RiakLinkPhase... phases) throws RiakClientException {
 		List<String> pathParams = new ArrayList<String>(Arrays.asList(bucket,
 				key));
 
 		for (RiakLinkPhase phase : phases)
 			pathParams.add(phase.toUrlFormat());
 
-		return new RiakRestResponse(restTemplate.getForEntity(
+		return new RiakRestResponse<T>(restTemplate.getForEntity(
 				getRiakUrl((String[]) pathParams.toArray(new String[pathParams
-						.size()])), byte[].class));
+						.size()])), clazz));
 	}
 
 	/*

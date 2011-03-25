@@ -15,22 +15,19 @@
  */
 package org.springframework.data.keyvalue.riak.parameter;
 
-import org.codehaus.jackson.annotate.JsonProperty;
-
 /**
  * @author Andrew Berman
  * 
  */
-public class RiakMapReduceParameters extends RiakParameters {
-	private Boolean chunked;
+public class RiakMapReduceParameter extends RiakParameter {
 
-	@JsonProperty("chunked")
-	public Boolean getChunked() {
-		return chunked;
+	public static final RiakMapReduceParameter chunked(boolean shouldChunk) {
+		return new RiakMapReduceParameter("chunked",
+				Boolean.toString(shouldChunk));
 	}
 
-	public void setChunked(Boolean chunked) {
-		this.chunked = chunked;
+	private RiakMapReduceParameter(String key, String value) {
+		super(key, value);
 	}
 
 }

@@ -15,49 +15,27 @@
  */
 package org.springframework.data.keyvalue.riak.parameter;
 
-import org.codehaus.jackson.annotate.JsonProperty;
 import org.springframework.data.keyvalue.riak.client.data.RiakQuorumValue;
 
 /**
  * @author Andrew Berman
  * 
  */
-public class RiakReadParameters extends RiakParameters {
-	private RiakQuorumValue read;
+public class RiakReadParameter extends RiakParameter {
 
-	private String vtag;
-
-	public RiakReadParameters() {
-		super();
-	}
-	
-	
-	public RiakReadParameters(RiakQuorumValue read, String vtag) {
-		super();
-		this.read = read;
-		this.vtag = vtag;
+	/**
+	 * @param key
+	 * @param value
+	 */
+	private RiakReadParameter(String key, String value) {
+		super(key, value);
 	}
 
-
-	@JsonProperty("r")
-	public RiakQuorumValue getRead() {
-		return read;
+	public static final RiakReadParameter read(RiakQuorumValue read) {
+		return new RiakReadParameter("r", read.toString());
 	}
 
-	@JsonProperty("r")
-	public RiakReadParameters setRead(RiakQuorumValue read) {
-		this.read = read;
-		return this;
-	}
-
-	@JsonProperty("vtag")
-	public String getVtag() {
-		return vtag;
-	}
-
-	@JsonProperty("vtag")
-	public RiakReadParameters setVtag(String vtag) {
-		this.vtag = vtag;
-		return this;
+	public static final RiakReadParameter vtag(String vtag) {
+		return new RiakReadParameter("vtag", vtag);
 	}
 }

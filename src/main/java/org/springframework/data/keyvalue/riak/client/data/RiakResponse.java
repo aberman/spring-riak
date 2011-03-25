@@ -23,8 +23,8 @@ import org.springframework.data.keyvalue.riak.util.RiakExtraInfo;
  * @author Andrew Berman
  * 
  */
-public interface RiakResponse<T extends RiakExtraInfo> extends Serializable {
-	byte[] getBytes();
+public interface RiakResponse<T> extends Serializable {
+	T getData();
 
-	T getExtraInfo();
+	RiakExtraInfo getExtraInfo();
 }
