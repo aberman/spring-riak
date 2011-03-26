@@ -16,6 +16,7 @@
 package org.springframework.data.keyvalue.riak.parameter;
 
 import org.springframework.data.keyvalue.riak.client.data.RiakQuorumValue;
+import org.springframework.data.keyvalue.riak.util.RiakConstants;
 
 /**
  * @author Andrew Berman
@@ -32,20 +33,20 @@ public class RiakStoreParameter extends RiakParameter {
 	}
 
 	public static final RiakStoreParameter read(RiakQuorumValue read) {
-		return new RiakStoreParameter("r", read.toString());
+		return new RiakStoreParameter(RiakConstants.READ, read.toString());
 	}
 
 	public static final RiakStoreParameter write(RiakQuorumValue write) {
-		return new RiakStoreParameter("w", write.toString());
+		return new RiakStoreParameter(RiakConstants.WRITE, write.toString());
 	}
 
 	public static final RiakStoreParameter durableWrite(
 			RiakQuorumValue durableWrite) {
-		return new RiakStoreParameter("dw", durableWrite.toString());
+		return new RiakStoreParameter(RiakConstants.DURABLE_WRITE, durableWrite.toString());
 	}
 
 	public static final RiakStoreParameter shouldReturnBody(boolean returnBody) {
-		return new RiakStoreParameter("returnbody",
+		return new RiakStoreParameter(RiakConstants.RETURNBODY,
 				Boolean.toString(returnBody));
 	}
 

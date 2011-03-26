@@ -20,18 +20,20 @@ import java.util.Set;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.codehaus.jackson.annotate.JsonProperty;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
+import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 
 /**
  * @author Andrew Berman
  * 
  */
+@JsonSerialize(include = Inclusion.NON_NULL)
 public class RiakBucket {
 	private RiakBucketProperties bucketProperties;
 
 	private Set<String> keys;
 
 	public RiakBucket() {
-
 	}
 
 	/**
@@ -79,5 +81,4 @@ public class RiakBucket {
 		return new HashCodeBuilder().append(bucketProperties.getName())
 				.toHashCode();
 	}
-
 }

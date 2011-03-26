@@ -15,261 +15,95 @@
  */
 package org.springframework.data.keyvalue.riak.client.data;
 
-import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
 
-import org.codehaus.jackson.annotate.JsonProperty;
-import org.codehaus.jackson.annotate.JsonSetter;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
+import org.springframework.data.keyvalue.riak.util.RiakConstants;
 
-@JsonSerialize(include = Inclusion.NON_NULL)
-public class RiakBucketProperties implements Serializable {
+@JsonSerialize(include = Inclusion.NON_NULL, as = Map.class)
+public class RiakBucketProperties extends HashMap<String, Object> implements
+		Map<String, Object> {
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -7247402092105288471L;
+	private static final long serialVersionUID = 2505648174204678446L;
 
-	private String name;
-
-	private String nVal;
-
-	private Boolean allowMult;
-
-	private Boolean lastWriteWins;
-
-	private String[] preCommit;
-
-	private String[] postCommit;
-
-	private Map<String, String> chashKeyFun;
-
-	private Map<String, String> linkFun;
-
-	private Long oldVClock;
-
-	private Long youngVClock;
-
-	private Long bigVClock;
-
-	private Long smallVClock;
-
-	private RiakQuorumValue readOperation;
-
-	private RiakQuorumValue writeOperation;
-
-	private RiakQuorumValue durableWriteOperation;
-
-	private RiakQuorumValue readWriteOperation;
-
-	protected RiakBucketProperties() {
+	public RiakBucketProperties() {
 
 	}
 
-	public static final RiakBucketProperties getInstance() {
-		return new RiakBucketProperties();
-	}
-
-	public RiakBucketProperties(String name, String nVal, Boolean allowMult,
-			Boolean lastWriteWins, String[] preCommit, String[] postCommit,
-			Map<String, String> chashKeyFun, Map<String, String> linkFun,
-			Long oldVClock, Long youngVClock, Long bigVClock, Long smallVClock,
-			RiakQuorumValue readOperation, RiakQuorumValue writeOperation,
-			RiakQuorumValue durableWriteOperation,
-			RiakQuorumValue readWriteOperation) {
-		this.name = name;
-		this.nVal = nVal;
-		this.allowMult = allowMult;
-		this.lastWriteWins = lastWriteWins;
-		this.preCommit = preCommit;
-		this.postCommit = postCommit;
-		this.chashKeyFun = chashKeyFun;
-		this.linkFun = linkFun;
-		this.oldVClock = oldVClock;
-		this.youngVClock = youngVClock;
-		this.bigVClock = bigVClock;
-		this.smallVClock = smallVClock;
-		this.readOperation = readOperation;
-		this.writeOperation = writeOperation;
-		this.durableWriteOperation = durableWriteOperation;
-		this.readWriteOperation = readWriteOperation;
+	public RiakBucketProperties(RiakBucketProperty<?>[] props) {
+		for (RiakBucketProperty<?> prop : props)
+			put(prop.getKey(), prop.getValue());
 	}
 
 	public String getName() {
-		return name;
+		return (String) get(RiakConstants.NAME);
 	}
 
-	public RiakBucketProperties setName(String name) {
-		this.name = name;
-		return this;
+	public String getnVal() {
+		return (String) get(RiakConstants.N_VAL);
 	}
 
-	@JsonProperty("n_val")
-	public String getNVal() {
-		return nVal;
+	public Boolean getAllowMulti() {
+		return (Boolean) get(RiakConstants.ALLOW_MULT);
 	}
 
-	@JsonProperty("n_val")
-	public RiakBucketProperties setNVal(String nVal) {
-		this.nVal = nVal;
-		return this;
+	public Boolean getLastWriteWins() {
+		return (Boolean) get(RiakConstants.LAST_WRITE_WINS);
 	}
 
-	@JsonProperty("allow_mult")
-	public Boolean isAllowMult() {
-		return allowMult;
-	}
-
-	@JsonProperty("allow_mult")
-	public RiakBucketProperties setAllowMult(Boolean allowMult) {
-		this.allowMult = allowMult;
-		return this;
-	}
-
-	@JsonProperty("last_write_wins")
-	public Boolean isLastWriteWins() {
-		return lastWriteWins;
-	}
-
-	@JsonProperty("last_write_wins")
-	public RiakBucketProperties setLastWriteWins(Boolean lastWriteWins) {
-		this.lastWriteWins = lastWriteWins;
-		return this;
-	}
-
-	@JsonProperty("precommit")
-	public String[] getPreCommit() {
-		return preCommit;
-	}
-
-	@JsonProperty("precommit")
-	public RiakBucketProperties setPreCommit(String[] preCommit) {
-		this.preCommit = preCommit;
-		return this;
-	}
-
-	@JsonProperty("postcommit")
 	public String[] getPostCommit() {
-		return postCommit;
+		return (String[]) get(RiakConstants.POST_COMMIT);
 	}
 
-	@JsonProperty("postcommit")
-	public RiakBucketProperties setPostCommit(String[] postCommit) {
-		this.postCommit = postCommit;
-		return this;
+	public String[] getPreCommit() {
+		return (String[]) get(RiakConstants.PRE_COMMIT);
 	}
 
-	@JsonProperty("chash_keyfun")
+	@SuppressWarnings("unchecked")
 	public Map<String, String> getChashKeyFun() {
-		return chashKeyFun;
+		return (Map<String, String>) get(RiakConstants.CHASH_KEYFUN);
 	}
 
-	@JsonProperty("chash_keyfun")
-	public RiakBucketProperties setChashKeyFun(Map<String, String> chashKeyFun) {
-		this.chashKeyFun = chashKeyFun;
-		return this;
-	}
-
-	@JsonProperty("linkfun")
+	@SuppressWarnings("unchecked")
 	public Map<String, String> getLinkFun() {
-		return linkFun;
+		return (Map<String, String>) get(RiakConstants.LINKFUN);
 	}
 
-	@JsonProperty("linkfun")
-	public RiakBucketProperties setLinkFun(Map<String, String> linkFun) {
-		this.linkFun = linkFun;
-		return this;
-	}
-
-	@JsonProperty("old_vclock")
 	public Long getOldVClock() {
-		return oldVClock;
+		return (Long) get(RiakConstants.OLD_VCLOCK);
 	}
 
-	@JsonProperty("old_vclock")
-	public RiakBucketProperties setOldVClock(Long oldVClock) {
-		this.oldVClock = oldVClock;
-		return this;
-	}
-
-	@JsonProperty("young_vclock")
 	public Long getYoungVClock() {
-		return youngVClock;
+		return (Long) get(RiakConstants.YOUNG_VCLOCK);
 	}
 
-	@JsonProperty("young_vclock")
-	public RiakBucketProperties setYoungVClock(Long youngVClock) {
-		this.youngVClock = youngVClock;
-		return this;
-	}
-
-	@JsonProperty("big_vclock")
 	public Long getBigVClock() {
-		return bigVClock;
+		return (Long) get(RiakConstants.BIG_VCLOCK);
 	}
 
-	@JsonProperty("big_vclock")
-	public RiakBucketProperties setBigVClock(Long bigVClock) {
-		this.bigVClock = bigVClock;
-		return this;
-	}
-
-	@JsonProperty("small_vclock")
 	public Long getSmallVClock() {
-		return smallVClock;
+		return (Long) get(RiakConstants.SMALL_VCLOCK);
 	}
 
-	@JsonProperty("small_vclock")
-	public RiakBucketProperties setSmallVClock(Long smallVClock) {
-		this.smallVClock = smallVClock;
-		return this;
+	public RiakQuorumValue getRead() {
+		return (RiakQuorumValue) get(RiakConstants.READ);
 	}
 
-	@JsonProperty("r")
-	public RiakQuorumValue getReadOperation() {
-		return readOperation;
+	public RiakQuorumValue getWrite() {
+		return (RiakQuorumValue) get(RiakConstants.WRITE);
 	}
 
-	@JsonProperty("r")
-	public RiakBucketProperties setReadOperation(RiakQuorumValue readOperation) {
-		this.readOperation = readOperation;
-		return this;
+	public RiakQuorumValue getReadWrite() {
+		return (RiakQuorumValue) get(RiakConstants.READ_WRITE);
 	}
 
-	@JsonProperty("w")
-	public RiakQuorumValue getWriteOperation() {
-		return writeOperation;
+	public RiakQuorumValue getDurableWrite() {
+		return (RiakQuorumValue) get(RiakConstants.DURABLE_WRITE);
 	}
 
-	@JsonProperty("w")
-	public RiakBucketProperties setWriteOperation(RiakQuorumValue writeOperation) {
-		this.writeOperation = writeOperation;
-		return this;
-	}
-
-	@JsonProperty("dw")
-	public RiakQuorumValue getDurableWriteOperation() {
-		return durableWriteOperation;
-	}
-
-	@JsonProperty("dw")
-	@JsonSetter("dw")
-	public RiakBucketProperties setDurableWriteOperation(
-			RiakQuorumValue durableWriteOperation) {
-		this.durableWriteOperation = durableWriteOperation;
-		return this;
-	}
-
-	@JsonProperty("rw")
-	public RiakQuorumValue getReadWriteOperation() {
-		return readWriteOperation;
-	}
-
-	@JsonProperty("rw")
-	public RiakBucketProperties setReadWriteOperation(
-			RiakQuorumValue readWriteOperation) {
-		this.readWriteOperation = readWriteOperation;
-		return this;
-	}
 }

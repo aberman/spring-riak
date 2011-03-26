@@ -19,7 +19,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -28,13 +28,11 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.type.TypeFactory;
 import org.codehaus.jackson.node.ArrayNode;
-import org.codehaus.jackson.type.JavaType;
 import org.springframework.data.keyvalue.riak.client.data.ResultCallbackHandler;
 import org.springframework.data.keyvalue.riak.client.data.RiakBucket;
 import org.springframework.data.keyvalue.riak.client.data.RiakBucketProperties;
+import org.springframework.data.keyvalue.riak.client.data.RiakBucketProperty;
 import org.springframework.data.keyvalue.riak.client.data.RiakResponse;
 import org.springframework.data.keyvalue.riak.client.data.RiakRestResponse;
 import org.springframework.data.keyvalue.riak.mapreduce.RiakLinkPhase;
@@ -45,6 +43,7 @@ import org.springframework.data.keyvalue.riak.parameter.RiakMapReduceParameter;
 import org.springframework.data.keyvalue.riak.parameter.RiakParameter;
 import org.springframework.data.keyvalue.riak.parameter.RiakReadParameter;
 import org.springframework.data.keyvalue.riak.parameter.RiakStoreParameter;
+import org.springframework.data.keyvalue.riak.util.RiakConstants;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
@@ -119,8 +118,8 @@ public class RiakRestClient implements RiakManager {
 		try {
 			return new URI(isUseSSL() ? "https" : "http", null, this.host,
 					this.port, "/" + StringUtils.join(path, "/"),
-					queryParams != null ? StringUtils.join(queryParams, "&")
-							: null, null).toString();
+					queryParams != null && queryParams.length > 0 ? StringUtils
+							.join(queryParams, "&") : null, null).toString();
 		} catch (URISyntaxException e) {
 			// should never happen
 			logger.fatal("Error formatting the URI");
@@ -185,16 +184,16 @@ public class RiakRestClient implements RiakManager {
 
 	@Override
 	public void setBucketProperties(String bucket,
-			RiakBucketProperties bucketProperties) throws RiakClientException {
+			RiakBucketProperty<?>... bucketProperties)
+			throws RiakClientException {
 		Assert.notNull(bucket, "The bucket cannot be null");
-		Assert.notNull(bucketProperties, "The bucket properties cannot be null");
-
-		Map<String, RiakBucketProperties> propMap = new HashMap<String, RiakBucketProperties>();
-		propMap.put("props", bucketProperties);
+		Assert.notNull(bucketProperties,
+				"At least one bucket property must be set");
 
 		try {
 			restTemplate.put(getRiakUrl((RiakParameter[]) null, bucket),
-					propMap);
+					Collections.singletonMap(RiakConstants.PROPS,
+							new RiakBucketProperties(bucketProperties)));
 		} catch (RestClientException e) {
 			throw new RiakClientException(e.getMessage(), e);
 		}

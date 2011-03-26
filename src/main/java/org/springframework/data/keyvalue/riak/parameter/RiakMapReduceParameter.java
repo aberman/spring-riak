@@ -15,6 +15,8 @@
  */
 package org.springframework.data.keyvalue.riak.parameter;
 
+import org.springframework.data.keyvalue.riak.util.RiakConstants;
+
 /**
  * @author Andrew Berman
  * 
@@ -22,7 +24,7 @@ package org.springframework.data.keyvalue.riak.parameter;
 public class RiakMapReduceParameter extends RiakParameter {
 
 	public static final RiakMapReduceParameter chunked(boolean shouldChunk) {
-		return new RiakMapReduceParameter("chunked",
+		return new RiakMapReduceParameter(RiakConstants.CHUNKED,
 				Boolean.toString(shouldChunk));
 	}
 

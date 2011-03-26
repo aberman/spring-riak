@@ -20,7 +20,7 @@ import java.util.List;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.data.keyvalue.riak.client.data.ResultCallbackHandler;
 import org.springframework.data.keyvalue.riak.client.data.RiakBucket;
-import org.springframework.data.keyvalue.riak.client.data.RiakBucketProperties;
+import org.springframework.data.keyvalue.riak.client.data.RiakBucketProperty;
 import org.springframework.data.keyvalue.riak.client.data.RiakResponse;
 import org.springframework.data.keyvalue.riak.mapreduce.RiakLinkPhase;
 import org.springframework.data.keyvalue.riak.mapreduce.RiakMapReduceJob;
@@ -44,7 +44,7 @@ public interface RiakManager extends InitializingBean {
 			RiakBucketReadParameter... params) throws RiakClientException;
 
 	void setBucketProperties(String bucket,
-			RiakBucketProperties bucketProperties) throws RiakClientException;
+			RiakBucketProperty<?>... property) throws RiakClientException;
 
 	/*
 	 * Key/Value operations

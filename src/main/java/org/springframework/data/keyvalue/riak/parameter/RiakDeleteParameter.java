@@ -16,6 +16,7 @@
 package org.springframework.data.keyvalue.riak.parameter;
 
 import org.springframework.data.keyvalue.riak.client.data.RiakQuorumValue;
+import org.springframework.data.keyvalue.riak.util.RiakConstants;
 
 /**
  * @author Andrew Berman
@@ -32,6 +33,6 @@ public class RiakDeleteParameter extends RiakParameter {
 	}
 
 	public static final RiakDeleteParameter readWrite(RiakQuorumValue val) {
-		return new RiakDeleteParameter("rw", val.toString());
+		return new RiakDeleteParameter(RiakConstants.READ_WRITE, val.toString());
 	}
 }

@@ -19,8 +19,7 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 
 import org.springframework.data.keyvalue.riak.client.data.RiakBucket;
-import org.springframework.data.keyvalue.riak.client.data.RiakBucketProperties;
-import org.springframework.data.keyvalue.riak.client.data.RiakQuorumValue;
+import org.springframework.data.keyvalue.riak.client.data.RiakBucketProperty;
 import org.springframework.data.keyvalue.riak.client.data.RiakResponse;
 import org.springframework.data.keyvalue.riak.parameter.RiakBucketReadParameter;
 import org.springframework.data.keyvalue.riak.parameter.RiakBucketReadParameter.KeyRetrievalType;
@@ -81,11 +80,13 @@ public class RiakRestClientTests {
 
 	@Test(groups = { "bucket", "write" })
 	public void setBucketInformationTest() {
-		restClient.setBucketProperties(TEST_BUCKET, RiakBucketProperties
-				.getInstance().setWriteOperation(RiakQuorumValue.ALL));
+		restClient.setBucketProperties(TEST_BUCKET,
+				RiakBucketProperty.allowMulti(true));
+		restClient.setBucketProperties(TEST_BUCKET,
+				RiakBucketProperty.allowMulti(false));
 		RiakBucket bucket = restClient.getBucketInformation(TEST_BUCKET);
-		assertEquals(bucket.getBucketProperties().getWriteOperation(),
-				RiakQuorumValue.ALL);
+		assertEquals(bucket.getBucketProperties().getAllowMulti(),
+				Boolean.FALSE);
 	}
 
 	/*
@@ -132,22 +133,23 @@ public class RiakRestClientTests {
 	 * Map/Reduce Test
 	 */
 	public void mapReduceKeyFilterTest() throws Exception {
-//		RiakResponse response = restClient
-//				.executeMapReduceJob(new RiakMapReduceJob(TEST_BUCKET,
-//						RiakMapReduceRestrictions.eq(TEST_KEY)).addMap(
-//						RiakJavascriptNamedFunction.MAP_VALUES).addReduce(
-//						RiakJavascriptNamedFunction.REDUCE_SORT));
-//		assertNotNull(response);
-//
-//		restClient.executeMapReduceJob(job, new ResultCallbackHandler<Long>() {
-//
-//			@Override
-//			public void processResult(RiakResponse<Long> response) {
-//				// TODO Auto-generated method stub
-//
-//			}
-//
-//		});
+		// RiakResponse response = restClient
+		// .executeMapReduceJob(new RiakMapReduceJob(TEST_BUCKET,
+		// RiakMapReduceRestrictions.eq(TEST_KEY)).addMap(
+		// RiakJavascriptNamedFunction.MAP_VALUES).addReduce(
+		// RiakJavascriptNamedFunction.REDUCE_SORT));
+		// assertNotNull(response);
+		//
+		// restClient.executeMapReduceJob(job, new ResultCallbackHandler<Long>()
+		// {
+		//
+		// @Override
+		// public void processResult(RiakResponse<Long> response) {
+		// // TODO Auto-generated method stub
+		//
+		// }
+		//
+		// });
 
 	}
 }

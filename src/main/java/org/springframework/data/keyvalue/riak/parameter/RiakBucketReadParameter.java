@@ -15,6 +15,8 @@
  */
 package org.springframework.data.keyvalue.riak.parameter;
 
+import org.springframework.data.keyvalue.riak.util.RiakConstants;
+
 
 /**
  * @author Andrew Berman
@@ -45,12 +47,12 @@ public class RiakBucketReadParameter extends RiakParameter {
 
 	public static final RiakBucketReadParameter showProperties(
 			boolean showProperties) {
-		return new RiakBucketReadParameter("props",
+		return new RiakBucketReadParameter(RiakConstants.PROPS,
 				Boolean.toString(showProperties));
 	}
 
 	public static final RiakBucketReadParameter keyRetrievalType(
 			KeyRetrievalType type) {
-		return new RiakBucketReadParameter("keys", type.toString());
+		return new RiakBucketReadParameter(RiakConstants.KEYS, type.toString());
 	}
 }

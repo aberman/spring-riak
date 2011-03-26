@@ -16,6 +16,7 @@
 package org.springframework.data.keyvalue.riak.parameter;
 
 import org.springframework.data.keyvalue.riak.client.data.RiakQuorumValue;
+import org.springframework.data.keyvalue.riak.util.RiakConstants;
 
 /**
  * @author Andrew Berman
@@ -32,10 +33,10 @@ public class RiakReadParameter extends RiakParameter {
 	}
 
 	public static final RiakReadParameter read(RiakQuorumValue read) {
-		return new RiakReadParameter("r", read.toString());
+		return new RiakReadParameter(RiakConstants.READ, read.toString());
 	}
 
 	public static final RiakReadParameter vtag(String vtag) {
-		return new RiakReadParameter("vtag", vtag);
+		return new RiakReadParameter(RiakConstants.VTAG, vtag);
 	}
 }
