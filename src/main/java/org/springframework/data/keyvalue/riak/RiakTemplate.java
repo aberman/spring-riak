@@ -22,7 +22,6 @@ import java.util.List;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.data.keyvalue.riak.client.RiakClientException;
 import org.springframework.data.keyvalue.riak.client.RiakManager;
-import org.springframework.data.keyvalue.riak.client.RiakRestClient;
 import org.springframework.data.keyvalue.riak.client.data.RiakBucket;
 import org.springframework.data.keyvalue.riak.client.data.RiakResponse;
 import org.springframework.data.keyvalue.riak.mapreduce.RiakMapReduceJob;
@@ -313,17 +312,16 @@ public class RiakTemplate extends RiakAccessor implements RiakOperations {
 	public <T> T execute(RiakCallback<T> action) throws RiakDataException {
 		Assert.notNull(action, "Callback object must not be null");
 
-		RiakRestClient rm = (RiakRestClient) getRiakManager();
+		RiakManager rm = getRiakManager();
 
 		if (rm == null) {
-			logger.debug("Creating new RiakManager for execute");
-			// create new riakManager
+			throw new RiakDataException("The RiakManager cannot be null");
 		}
 
 		try {
 			return action.doInRiak(rm);
-		} catch (RuntimeException ex) {
-			throw new RiakClientException(ex.getMessage(), ex);
+		} catch (RiakClientException ex) {
+			throw new RiakDataException(ex.getMessage(), ex);
 		}
 
 	}

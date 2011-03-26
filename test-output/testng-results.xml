@@ -2,7 +2,7 @@
 <testng-results skipped="0" failed="0" total="7" passed="7">
   <reporter-output>
   </reporter-output>
-  <suite name="Default suite" duration-ms="11230" started-at="2011-03-25T15:25:28Z" finished-at="2011-03-25T15:25:39Z">
+  <suite name="Default suite" duration-ms="8206" started-at="2011-03-25T20:21:47Z" finished-at="2011-03-25T20:21:55Z">
     <groups>
       <group name="bucket">
         <method signature="org.springframework.data.keyvalue.riak.client.RiakRestClientTests.getBucketInformationTest()" name="getBucketInformationTest" class="org.springframework.data.keyvalue.riak.client.RiakRestClientTests"/>
@@ -29,25 +29,25 @@
         <method signature="org.springframework.data.keyvalue.riak.client.RiakRestClientTests.storeValueTest()" name="storeValueTest" class="org.springframework.data.keyvalue.riak.client.RiakRestClientTests"/>
       </group>
     </groups>
-    <test name="Default test" duration-ms="11230" started-at="2011-03-25T15:25:28Z" finished-at="2011-03-25T15:25:39Z">
+    <test name="Default test" duration-ms="8206" started-at="2011-03-25T20:21:47Z" finished-at="2011-03-25T20:21:55Z">
       <class name="org.springframework.data.keyvalue.riak.client.RiakRestClientTests">
-        <test-method status="PASS" signature="setUp()" name="setUp" is-config="true" duration-ms="1016" started-at="2011-03-25T15:25:28Z" finished-at="2011-03-25T15:25:29Z">
+        <test-method status="PASS" signature="setUp()" name="setUp" is-config="true" duration-ms="1019" started-at="2011-03-25T20:21:47Z" finished-at="2011-03-25T20:21:48Z">
         </test-method>
-        <test-method status="PASS" signature="deleteKeyTest()" name="deleteKeyTest" duration-ms="215" started-at="2011-03-25T15:25:29Z" finished-at="2011-03-25T15:25:29Z">
+        <test-method status="PASS" signature="deleteKeyTest()" name="deleteKeyTest" duration-ms="290" started-at="2011-03-25T20:21:48Z" finished-at="2011-03-25T20:21:48Z">
         </test-method>
-        <test-method status="PASS" signature="getBucketInformationTest()" name="getBucketInformationTest" duration-ms="3943" started-at="2011-03-25T15:25:29Z" finished-at="2011-03-25T15:25:33Z">
+        <test-method status="PASS" signature="getBucketInformationTest()" name="getBucketInformationTest" duration-ms="2344" started-at="2011-03-25T20:21:48Z" finished-at="2011-03-25T20:21:50Z">
         </test-method>
-        <test-method status="PASS" signature="getValueTest()" name="getValueTest" duration-ms="296" started-at="2011-03-25T15:25:33Z" finished-at="2011-03-25T15:25:33Z">
+        <test-method status="PASS" signature="getValueTest()" name="getValueTest" duration-ms="155" started-at="2011-03-25T20:21:50Z" finished-at="2011-03-25T20:21:51Z">
         </test-method>
-        <test-method status="PASS" signature="listBucketsTest()" name="listBucketsTest" duration-ms="1468" started-at="2011-03-25T15:25:33Z" finished-at="2011-03-25T15:25:35Z">
+        <test-method status="PASS" signature="listBucketsTest()" name="listBucketsTest" duration-ms="1210" started-at="2011-03-25T20:21:51Z" finished-at="2011-03-25T20:21:52Z">
         </test-method>
-        <test-method status="PASS" signature="setBucketInformationTest()" name="setBucketInformationTest" duration-ms="453" started-at="2011-03-25T15:25:35Z" finished-at="2011-03-25T15:25:35Z">
+        <test-method status="PASS" signature="setBucketInformationTest()" name="setBucketInformationTest" duration-ms="330" started-at="2011-03-25T20:21:52Z" finished-at="2011-03-25T20:21:52Z">
         </test-method>
-        <test-method status="PASS" signature="storeKeyValueTest()" name="storeKeyValueTest" duration-ms="1479" started-at="2011-03-25T15:25:35Z" finished-at="2011-03-25T15:25:36Z">
+        <test-method status="PASS" signature="storeKeyValueTest()" name="storeKeyValueTest" duration-ms="1057" started-at="2011-03-25T20:21:52Z" finished-at="2011-03-25T20:21:53Z">
         </test-method>
-        <test-method status="PASS" signature="storeValueTest()" name="storeValueTest" duration-ms="1477" started-at="2011-03-25T15:25:36Z" finished-at="2011-03-25T15:25:38Z">
+        <test-method status="PASS" signature="storeValueTest()" name="storeValueTest" duration-ms="901" started-at="2011-03-25T20:21:53Z" finished-at="2011-03-25T20:21:54Z">
         </test-method>
-        <test-method status="PASS" signature="tearDown()" name="tearDown" is-config="true" duration-ms="798" started-at="2011-03-25T15:25:38Z" finished-at="2011-03-25T15:25:39Z">
+        <test-method status="PASS" signature="tearDown()" name="tearDown" is-config="true" duration-ms="803" started-at="2011-03-25T20:21:54Z" finished-at="2011-03-25T20:21:55Z">
         </test-method>
       </class>
     </test>

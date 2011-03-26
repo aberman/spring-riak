@@ -5,9 +5,9 @@
     <classes>
       <class name="org.springframework.data.keyvalue.riak.client.RiakRestClientTests">
         <methods>
+          <include name="setBucketInformationTest"/>
           <include name="tearDown"/>
           <include name="setUp"/>
-          <include name="mapReduceKeyFilterTest"/>
         </methods>
       </class>
     </classes>
