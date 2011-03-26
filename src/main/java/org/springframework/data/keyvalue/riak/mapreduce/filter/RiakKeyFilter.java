@@ -23,7 +23,7 @@ import org.codehaus.jackson.annotate.JsonValue;
  * @author Andrew Berman
  * 
  */
-public interface RiakMapReduceKeyFilter extends Serializable {
+public interface RiakKeyFilter extends Serializable {
 	
 	@JsonValue
 	public Object[] getValueArray();

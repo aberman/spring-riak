@@ -20,9 +20,9 @@ package org.springframework.data.keyvalue.riak.mapreduce;
  * @author Andrew Berman
  *
  */
-public class RiakErlangMapReduceFunction extends RiakMapReduceFunction {
+public class RiakErlangFunction extends RiakMapReduceFunction {
 
-	public RiakErlangMapReduceFunction() {
+	public RiakErlangFunction() {
 		super(Language.ERLANG);
 	}
 }

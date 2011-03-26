@@ -61,4 +61,14 @@ public abstract class RiakConstants {
 	public static final String KEYS = "keys";
 	
 	public static final String PROPS = "props";
+	
+	public static final String SOURCE = "source";
+	
+	public static final String BUCKET = "bucket";
+	
+	public static final String KEY = "key";
+	
+	public static final String FUNCTION_NAME = "name";
+	
+	public static final String KEY_FILTERS = "key_filters";
 }

@@ -25,7 +25,7 @@ import org.codehaus.jackson.annotate.JsonPropertyOrder;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 import org.springframework.data.keyvalue.riak.client.data.RiakBucketKeyValue;
-import org.springframework.data.keyvalue.riak.mapreduce.filter.RiakMapReduceKeyFilter;
+import org.springframework.data.keyvalue.riak.mapreduce.filter.RiakKeyFilter;
 
 /**
  * @author Andrew Berman
@@ -59,7 +59,7 @@ public class RiakMapReduceJob {
 		this.input = RiakMapReduceInput.getInstance(bucketKeyPairs);
 	}
 
-	public RiakMapReduceJob(String bucket, RiakMapReduceKeyFilter... filter) {
+	public RiakMapReduceJob(String bucket, RiakKeyFilter... filter) {
 		this.input = RiakMapReduceInput.getInstance(bucket, filter);
 	}
 

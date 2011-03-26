@@ -22,7 +22,7 @@ import org.springframework.data.keyvalue.riak.mapreduce.filter.transform.RiakTok
  * @author Andrew Berman
  * 
  */
-public abstract class RiakMapReduceTransformations {
+public abstract class RiakKeyFilterTransformations {
 	public static RiakSimpleTransformer intToString() {
 		return new RiakSimpleTransformer("int_to_string");
 	}

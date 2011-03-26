@@ -15,72 +15,55 @@
  */
 package org.springframework.data.keyvalue.riak.mapreduce;
 
-import org.codehaus.jackson.annotate.JsonProperty;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.codehaus.jackson.annotate.JsonValue;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 import org.springframework.data.keyvalue.riak.client.data.RiakBucketKeyValue;
-import org.springframework.data.keyvalue.riak.mapreduce.filter.RiakMapReduceKeyFilter;
+import org.springframework.data.keyvalue.riak.mapreduce.filter.RiakKeyFilter;
+import org.springframework.data.keyvalue.riak.util.RiakConstants;
 
 /**
  * @author Andrew Berman
  * 
  */
 @JsonSerialize(include = Inclusion.NON_NULL)
-abstract class RiakMapReduceInput {
+public class RiakMapReduceInput {
+	private Object data;
 
 	public static final RiakMapReduceInput getInstance(String bucket) {
-		return new RiakBucketInput(bucket);
+		return new RiakMapReduceInput(bucket);
 	}
 
-	public static final RiakBucketInput getInstance(String bucket,
-			RiakMapReduceKeyFilter... bucketFilters) {
-		return new RiakBucketInput(bucket, bucketFilters);
+	public static final RiakMapReduceInput getInstance(String bucket,
+			RiakKeyFilter... bucketFilters) {
+		return new RiakMapReduceInput(bucket, bucketFilters);
 	}
 
-	public static final RiakBucketKeyPairsInput getInstance(
+	public static final RiakMapReduceInput getInstance(
 			RiakBucketKeyValue... bucketKeyPairs) {
-		return new RiakBucketKeyPairsInput(bucketKeyPairs);
+		return new RiakMapReduceInput(bucketKeyPairs);
 	}
 
-	public static class RiakBucketInput extends RiakMapReduceInput {
-
-		private String bucket;
-
-		private RiakMapReduceKeyFilter[] bucketKeyFilters;
-
-		public RiakBucketInput(String bucket) {
-			this.bucket = bucket;
-		}
-
-		public RiakBucketInput(String bucket,
-				RiakMapReduceKeyFilter... bucketKeyFilters) {
-			this.bucket = bucket;
-			this.bucketKeyFilters = bucketKeyFilters;
-		}
-
-		@JsonProperty
-		public String getBucket() {
-			return bucket;
-		}
-
-		@JsonProperty("key_filters")
-		public RiakMapReduceKeyFilter[] getBucketKeyFilters() {
-			return bucketKeyFilters;
-		}
-
+	private RiakMapReduceInput(String bucket,
+			RiakKeyFilter... bucketFilters) {
+		if (bucketFilters != null && bucketFilters.length > 0) {
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put(RiakConstants.BUCKET, bucket);
+			map.put(RiakConstants.KEY_FILTERS, bucketFilters);
+			this.data = map;
+		} else
+			this.data = bucket;
 	}
 
-	public static class RiakBucketKeyPairsInput extends RiakMapReduceInput {
-		private RiakBucketKeyValue[] bucketKeyPairs;
+	private RiakMapReduceInput(RiakBucketKeyValue... bucketKeyPairs) {
+		this.data = bucketKeyPairs;
+	}
 
-		public RiakBucketKeyPairsInput(RiakBucketKeyValue... bucketKeyPairs) {
-			this.bucketKeyPairs = bucketKeyPairs;
-		}
-
-		@JsonValue
-		public RiakBucketKeyValue[] getBucketKeyPairs() {
-			return bucketKeyPairs;
-		}
+	@JsonValue
+	public Object getData() {
+		return this.data;
 	}
 }

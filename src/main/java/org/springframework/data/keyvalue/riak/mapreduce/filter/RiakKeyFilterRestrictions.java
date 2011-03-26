@@ -26,7 +26,7 @@ import org.springframework.data.keyvalue.riak.mapreduce.filter.predicate.RiakSim
  * @author Andrew Berman
  * 
  */
-public abstract class RiakMapReduceRestrictions {
+public abstract class RiakKeyFilterRestrictions {
 
 	public static RiakSimplePredicate gt(Object value) {
 		return new RiakSimplePredicate("greater_than", value);

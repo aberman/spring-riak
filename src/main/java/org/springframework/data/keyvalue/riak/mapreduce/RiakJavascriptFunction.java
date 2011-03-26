@@ -15,14 +15,16 @@
  */
 package org.springframework.data.keyvalue.riak.mapreduce;
 
+import org.codehaus.jackson.annotate.JsonProperty;
+import org.springframework.data.keyvalue.riak.util.RiakConstants;
+
 /**
  * @author Andrew Berman
  * 
  */
-public abstract class RiakJavascriptMapReduceFunction extends
-		RiakMapReduceFunction {
+public abstract class RiakJavascriptFunction extends RiakMapReduceFunction {
 
-	public RiakJavascriptMapReduceFunction() {
+	public RiakJavascriptFunction() {
 		super(Language.JAVASCRIPT);
 	}
 
@@ -50,55 +52,36 @@ public abstract class RiakJavascriptMapReduceFunction extends
 	public static final RiakJavascriptNamedFunction REDUCE_SLICE = new RiakJavascriptNamedFunction(
 			"Riak.reduceSlice");
 
-	public static final RiakJavascriptMapReduceFunction src(String src) {
+	public static final RiakJavascriptFunction src(String src) {
 		return new RiakJavascriptSrcFunction(src);
 	}
 
-	public static final RiakJavascriptMapReduceFunction named(String name) {
+	public static final RiakJavascriptFunction named(String name) {
 		return new RiakJavascriptNamedFunction(name);
 	}
 
-	public static final RiakJavascriptMapReduceFunction bucketKey(
-			String bucket, String key) {
-		return new RiakJavascriptBucketFunction(bucket, key);
-	}
+	public abstract String getValue();
 
 	private static class RiakJavascriptSrcFunction extends
-			RiakJavascriptMapReduceFunction {
+			RiakJavascriptFunction {
+
 		private String source;
 
 		public RiakJavascriptSrcFunction(String source) {
+			super();
 			this.source = source;
 		}
 
-		public String getSource() {
-			return source;
+		@Override
+		@JsonProperty(RiakConstants.SOURCE)
+		public String getValue() {
+			return this.source;
 		}
 
-	}
-
-	private static class RiakJavascriptBucketFunction extends
-			RiakJavascriptMapReduceFunction {
-		private String bucket;
-
-		private String key;
-
-		public RiakJavascriptBucketFunction(String bucket, String key) {
-			this.bucket = bucket;
-			this.key = key;
-		}
-
-		public String getBucket() {
-			return bucket;
-		}
-
-		public String getKey() {
-			return key;
-		}
 	}
 
 	private static class RiakJavascriptNamedFunction extends
-			RiakJavascriptMapReduceFunction {
+			RiakJavascriptFunction {
 
 		private String name;
 
@@ -106,8 +89,10 @@ public abstract class RiakJavascriptMapReduceFunction extends
 			this.name = name;
 		}
 
-		public String getName() {
-			return name;
+		@Override
+		@JsonProperty(RiakConstants.FUNCTION_NAME)
+		public String getValue() {
+			return this.name;
 		}
 
 	}
