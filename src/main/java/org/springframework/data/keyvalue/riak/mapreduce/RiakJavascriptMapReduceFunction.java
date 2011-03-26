@@ -26,7 +26,44 @@ public abstract class RiakJavascriptMapReduceFunction extends
 		super(Language.JAVASCRIPT);
 	}
 
-	public static class RiakJavascriptSrcFunction extends
+	public static final RiakJavascriptNamedFunction MAP_VALUES = new RiakJavascriptNamedFunction(
+			"Riak.mapValues");
+
+	public static final RiakJavascriptNamedFunction MAP_VALUES_JSON = new RiakJavascriptNamedFunction(
+			"Riak.mapValuesJson");
+
+	public static final RiakJavascriptNamedFunction REDUCE_SUM = new RiakJavascriptNamedFunction(
+			"Riak.reduceSum");
+
+	public static final RiakJavascriptNamedFunction REDUCE_MIN = new RiakJavascriptNamedFunction(
+			"Riak.reduceMin");
+
+	public static final RiakJavascriptNamedFunction REDUCE_MAX = new RiakJavascriptNamedFunction(
+			"Riak.reduceMax");
+
+	public static final RiakJavascriptNamedFunction REDUCE_SORT = new RiakJavascriptNamedFunction(
+			"Riak.reduceSort");
+
+	public static final RiakJavascriptNamedFunction REDUCE_LIMIT = new RiakJavascriptNamedFunction(
+			"Riak.reduceLimit");
+
+	public static final RiakJavascriptNamedFunction REDUCE_SLICE = new RiakJavascriptNamedFunction(
+			"Riak.reduceSlice");
+
+	public static final RiakJavascriptMapReduceFunction src(String src) {
+		return new RiakJavascriptSrcFunction(src);
+	}
+
+	public static final RiakJavascriptMapReduceFunction named(String name) {
+		return new RiakJavascriptNamedFunction(name);
+	}
+
+	public static final RiakJavascriptMapReduceFunction bucketKey(
+			String bucket, String key) {
+		return new RiakJavascriptBucketFunction(bucket, key);
+	}
+
+	private static class RiakJavascriptSrcFunction extends
 			RiakJavascriptMapReduceFunction {
 		private String source;
 
@@ -40,7 +77,7 @@ public abstract class RiakJavascriptMapReduceFunction extends
 
 	}
 
-	public static class RiakJavascriptBucketFunction extends
+	private static class RiakJavascriptBucketFunction extends
 			RiakJavascriptMapReduceFunction {
 		private String bucket;
 
@@ -60,32 +97,8 @@ public abstract class RiakJavascriptMapReduceFunction extends
 		}
 	}
 
-	public static class RiakJavascriptNamedFunction extends
+	private static class RiakJavascriptNamedFunction extends
 			RiakJavascriptMapReduceFunction {
-
-		public static final RiakJavascriptNamedFunction MAP_VALUES = new RiakJavascriptNamedFunction(
-				"Riak.mapValues");
-
-		public static final RiakJavascriptNamedFunction MAP_VALUES_JSON = new RiakJavascriptNamedFunction(
-				"Riak.mapValuesJson");
-
-		public static final RiakJavascriptNamedFunction REDUCE_SUM = new RiakJavascriptNamedFunction(
-				"Riak.reduceSum");
-
-		public static final RiakJavascriptNamedFunction REDUCE_MIN = new RiakJavascriptNamedFunction(
-				"Riak.reduceMin");
-
-		public static final RiakJavascriptNamedFunction REDUCE_MAX = new RiakJavascriptNamedFunction(
-				"Riak.reduceMax");
-
-		public static final RiakJavascriptNamedFunction REDUCE_SORT = new RiakJavascriptNamedFunction(
-				"Riak.reduceSort");
-
-		public static final RiakJavascriptNamedFunction REDUCE_LIMIT = new RiakJavascriptNamedFunction(
-				"Riak.reduceLimit");
-
-		public static final RiakJavascriptNamedFunction REDUCE_SLICE = new RiakJavascriptNamedFunction(
-				"Riak.reduceSlice");
 
 		private String name;
 
