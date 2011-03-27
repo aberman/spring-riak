@@ -21,12 +21,14 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.data.keyvalue.riak.client.data.ResultCallbackHandler;
 import org.springframework.data.keyvalue.riak.client.data.RiakBucket;
 import org.springframework.data.keyvalue.riak.client.data.RiakBucketProperty;
+import org.springframework.data.keyvalue.riak.client.data.RiakLink;
 import org.springframework.data.keyvalue.riak.client.data.RiakResponse;
 import org.springframework.data.keyvalue.riak.mapreduce.RiakLinkPhase;
 import org.springframework.data.keyvalue.riak.mapreduce.RiakMapReduceJob;
 import org.springframework.data.keyvalue.riak.parameter.RiakBucketReadParameter;
 import org.springframework.data.keyvalue.riak.parameter.RiakDeleteParameter;
 import org.springframework.data.keyvalue.riak.parameter.RiakMapReduceParameter;
+import org.springframework.data.keyvalue.riak.parameter.RiakPutParameter;
 import org.springframework.data.keyvalue.riak.parameter.RiakReadParameter;
 import org.springframework.data.keyvalue.riak.parameter.RiakStoreParameter;
 
@@ -43,8 +45,8 @@ public interface RiakManager extends InitializingBean {
 	RiakBucket getBucketInformation(String bucket,
 			RiakBucketReadParameter... params) throws RiakClientException;
 
-	void setBucketProperties(String bucket,
-			RiakBucketProperty<?>... property) throws RiakClientException;
+	void setBucketProperties(String bucket, RiakBucketProperty<?>... property)
+			throws RiakClientException;
 
 	/*
 	 * Key/Value operations
@@ -53,10 +55,17 @@ public interface RiakManager extends InitializingBean {
 			RiakReadParameter... params) throws RiakClientException;
 
 	void storeKeyValue(String bucket, String key, Object value,
-			RiakStoreParameter... params) throws RiakClientException;
+			RiakPutParameter... params) throws RiakClientException;
 
 	String storeValue(String bucket, Object value, RiakStoreParameter... params)
 			throws RiakClientException;
+
+	void storeKeyValue(String bucket, String key, Object value,
+			List<RiakLink> links, RiakStoreParameter... params)
+			throws RiakClientException;
+
+	String storeValue(String bucket, Object value, List<RiakLink> links,
+			RiakStoreParameter... params) throws RiakClientException;
 
 	void deleteKey(String bucket, String key, RiakDeleteParameter... params)
 			throws RiakClientException;
@@ -64,7 +73,7 @@ public interface RiakManager extends InitializingBean {
 	/*
 	 * Map/Reduce operations
 	 */
-	<T> RiakResponse<T> executeMapReduceJob(RiakMapReduceJob job,
+	<T> RiakResponse<List<T>> executeMapReduceJob(RiakMapReduceJob job,
 			Class<T> clazz, RiakMapReduceParameter... params)
 			throws RiakClientException;
 
@@ -73,7 +82,7 @@ public interface RiakManager extends InitializingBean {
 			throws RiakClientException;
 
 	/*
-	 * Link Walking
+	 * Link operations
 	 */
 	<T> RiakResponse<T> walkLinks(String bucket, String key, Class<T> clazz,
 			RiakLinkPhase... phases) throws RiakClientException;

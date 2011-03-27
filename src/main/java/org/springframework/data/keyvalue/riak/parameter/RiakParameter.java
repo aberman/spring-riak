@@ -15,22 +15,26 @@
  */
 package org.springframework.data.keyvalue.riak.parameter;
 
-import org.codehaus.jackson.map.annotate.JsonSerialize;
-import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 
 /**
  * @author Andrew Berman
  * 
  */
-@JsonSerialize(include = Inclusion.NON_NULL)
 public abstract class RiakParameter {
 	private String key;
 
 	private String value;
 
-	protected RiakParameter(String key, String value) {
+	private Type type;
+
+	public enum Type {
+		QUERY, HEADER
+	}
+
+	protected RiakParameter(String key, String value, Type type) {
 		this.key = key;
 		this.value = value;
+		this.type = type;
 	}
 
 	public String getKey() {
@@ -41,40 +45,12 @@ public abstract class RiakParameter {
 		return value;
 	}
 
+	public Type getType() {
+		return type;
+	}
+
 	@Override
 	public String toString() {
 		return key + "=" + value;
 	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((key == null) ? 0 : key.hashCode());
-		result = prime * result + ((value == null) ? 0 : value.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		RiakParameter other = (RiakParameter) obj;
-		if (key == null) {
-			if (other.key != null)
-				return false;
-		} else if (!key.equals(other.key))
-			return false;
-		if (value == null) {
-			if (other.value != null)
-				return false;
-		} else if (!value.equals(other.value))
-			return false;
-		return true;
-	}
-
 }

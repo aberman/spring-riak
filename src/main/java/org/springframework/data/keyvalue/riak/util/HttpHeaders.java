@@ -23,6 +23,21 @@ import java.util.Map;
  */
 public class HttpHeaders extends org.springframework.http.HttpHeaders implements
 		RiakExtraInfo {
+	public static final String DATE_PATTERN = "EEE, dd MMM YYYY HH:mm:ss zzz";
+	public static final String X_RIAK_META = "X-Riak-Meta";
+	public static final String LINK = "Link";
+	public static final String ACCEPT = "Accept";
+	public static final String IF_NONE_MATCH = "If-None-Match";
+	public static final String IF_MODIFIED_SINCE = "If-Modified-Since";
+	public static final String X_RIAK_VCLOCK = "X-Riak-Vclock";
+	public static final String IF_MATCH = "If-Match";
+	public static final String IF_UNMODIFIED_SINCE = "If-Unmodified-Since";
+
+	public HttpHeaders(org.springframework.http.HttpHeaders headers) {
+		super();
+		this.putAll(org.springframework.http.HttpHeaders
+				.readOnlyHttpHeaders(headers));
+	}
 
 	@Override
 	public Map<String, String> getInfo() {

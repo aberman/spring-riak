@@ -15,7 +15,9 @@
  */
 package org.springframework.data.keyvalue.riak.parameter;
 
+import org.springframework.data.keyvalue.riak.client.data.RiakLink;
 import org.springframework.data.keyvalue.riak.client.data.RiakQuorumValue;
+import org.springframework.data.keyvalue.riak.util.HttpHeaders;
 import org.springframework.data.keyvalue.riak.util.RiakConstants;
 
 /**
@@ -28,26 +30,34 @@ public class RiakStoreParameter extends RiakParameter {
 	 * @param key
 	 * @param value
 	 */
-	private RiakStoreParameter(String key, String value) {
-		super(key, value);
-	}
-
-	public static final RiakStoreParameter read(RiakQuorumValue read) {
-		return new RiakStoreParameter(RiakConstants.READ, read.toString());
+	protected RiakStoreParameter(String key, String value, Type type) {
+		super(key, value, type);
 	}
 
 	public static final RiakStoreParameter write(RiakQuorumValue write) {
-		return new RiakStoreParameter(RiakConstants.WRITE, write.toString());
+		return new RiakStoreParameter(RiakConstants.WRITE, write.toString(),
+				Type.QUERY);
 	}
 
-	public static final RiakStoreParameter durableWrite(
-			RiakQuorumValue durableWrite) {
-		return new RiakStoreParameter(RiakConstants.DURABLE_WRITE, durableWrite.toString());
+	public static final RiakStoreParameter durableWrite(RiakQuorumValue durableWrite) {
+		return new RiakStoreParameter(RiakConstants.DURABLE_WRITE,
+				durableWrite.toString(), Type.QUERY);
 	}
 
 	public static final RiakStoreParameter shouldReturnBody(boolean returnBody) {
 		return new RiakStoreParameter(RiakConstants.RETURNBODY,
-				Boolean.toString(returnBody));
+				Boolean.toString(returnBody), Type.QUERY);
 	}
 
+	public static final RiakStoreParameter metaDataHeader(String metaData) {
+		return new RiakStoreParameter(HttpHeaders.X_RIAK_META, metaData,
+				Type.HEADER);
+	}
+
+	public static final RiakStoreParameter link(RiakLink link) {
+		return new RiakStoreParameter(HttpHeaders.LINK, link.toString(),
+				Type.HEADER);
+	}
+
+	
 }

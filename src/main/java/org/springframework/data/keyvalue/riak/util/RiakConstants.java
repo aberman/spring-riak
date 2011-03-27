@@ -71,4 +71,10 @@ public abstract class RiakConstants {
 	public static final String FUNCTION_NAME = "name";
 	
 	public static final String KEY_FILTERS = "key_filters";
+	
+	public static final String RIAK = "riak";
+	
+	public static final String RIAK_TAG = "riaktag";
+
+	public static final String BACKEND = "backend";
 }

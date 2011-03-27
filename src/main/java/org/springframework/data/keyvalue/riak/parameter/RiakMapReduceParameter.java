@@ -23,13 +23,12 @@ import org.springframework.data.keyvalue.riak.util.RiakConstants;
  */
 public class RiakMapReduceParameter extends RiakParameter {
 
+	private RiakMapReduceParameter(String key, String value) {
+		super(key, value, Type.QUERY);
+	}
+
 	public static final RiakMapReduceParameter chunked(boolean shouldChunk) {
 		return new RiakMapReduceParameter(RiakConstants.CHUNKED,
 				Boolean.toString(shouldChunk));
 	}
-
-	private RiakMapReduceParameter(String key, String value) {
-		super(key, value);
-	}
-
 }

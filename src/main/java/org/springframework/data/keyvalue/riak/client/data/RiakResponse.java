@@ -27,4 +27,6 @@ public interface RiakResponse<T> extends Serializable {
 	T getData();
 
 	RiakExtraInfo getExtraInfo();
+	
+	String getResponseStatus();
 }

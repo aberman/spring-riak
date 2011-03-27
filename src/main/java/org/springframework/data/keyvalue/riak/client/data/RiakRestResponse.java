@@ -16,7 +16,6 @@
 package org.springframework.data.keyvalue.riak.client.data;
 
 import org.springframework.data.keyvalue.riak.util.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
 
@@ -30,24 +29,35 @@ public class RiakRestResponse<T> implements RiakResponse<T> {
 	 * 
 	 */
 	private static final long serialVersionUID = -4613049362224120711L;
-	private ResponseEntity<T> re;
+	private T data;
+	private HttpHeaders extraInfo;
+	private String responseStatus;
 
 	public RiakRestResponse(ResponseEntity<T> re) {
 		Assert.notNull(re, "ResponseEntity cannot be null");
-		this.re = re;
+		this.data = re.getBody();
+		this.extraInfo = new HttpHeaders(re.getHeaders());
+		this.responseStatus = re.getStatusCode().toString();
+	}
+
+	public RiakRestResponse(T data, HttpHeaders extraInfo, String responseStatus) {
+		this.data = data;
+		this.extraInfo = extraInfo;
+		this.responseStatus = responseStatus;
 	}
 
 	@Override
 	public T getData() {
-		return re.getBody();
+		return this.data;
 	}
 
 	@Override
 	public HttpHeaders getExtraInfo() {
-		return (HttpHeaders) re.getHeaders();
+		return this.extraInfo;
 	}
 
-	public HttpStatus getHttpStatus() {
-		return re.getStatusCode();
+	@Override
+	public String getResponseStatus() {
+		return this.responseStatus;
 	}
 }

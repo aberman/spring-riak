@@ -29,7 +29,7 @@ public class RiakDeleteParameter extends RiakParameter {
 	 * @param value
 	 */
 	private RiakDeleteParameter(String key, String value) {
-		super(key, value);
+		super(key, value, Type.QUERY);
 	}
 
 	public static final RiakDeleteParameter readWrite(RiakQuorumValue val) {

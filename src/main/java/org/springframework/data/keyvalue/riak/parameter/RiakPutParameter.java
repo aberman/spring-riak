@@ -25,42 +25,46 @@ import org.springframework.data.keyvalue.riak.util.HttpHeaders;
 import org.springframework.data.keyvalue.riak.util.RiakConstants;
 
 /**
- * @author Andrew Berman
+ * @author andrewberman
  * 
  */
-public class RiakReadParameter extends RiakParameter {
+public class RiakPutParameter extends RiakStoreParameter {
 
-	private static final String MULTIPART_MIXED = "multipart/mixed";
-
-	/**
-	 * @param key
-	 * @param value
-	 */
-	private RiakReadParameter(String key, String value, Type type) {
-		super(key, value, type);
+	private RiakPutParameter(String key, String value, Type type) {
+		super(key, value, Type.HEADER);
 	}
 
-	public static final RiakReadParameter read(RiakQuorumValue read) {
-		return new RiakReadParameter(RiakConstants.READ, read.toString(),
+	public static final RiakPutParameter read(RiakQuorumValue read) {
+		return new RiakPutParameter(RiakConstants.READ, read.toString(),
 				Type.QUERY);
 	}
 
-	public static final RiakReadParameter vtag(String vtag) {
-		return new RiakReadParameter(RiakConstants.VTAG, vtag, Type.QUERY);
+	public static final RiakPutParameter vclock(long vclock) {
+		return new RiakPutParameter(HttpHeaders.X_RIAK_VCLOCK,
+				String.valueOf(vclock), Type.HEADER);
 	}
 
-	public static final RiakReadParameter returnAllSiblings = new RiakReadParameter(
-			HttpHeaders.ACCEPT, MULTIPART_MIXED, Type.HEADER);
-
-	public static final RiakReadParameter ifNoneMatch(String etag) {
-		return new RiakReadParameter(HttpHeaders.IF_NONE_MATCH, etag,
+	public static final RiakPutParameter ifNoneMatch(String etag) {
+		return new RiakPutParameter(HttpHeaders.IF_NONE_MATCH, etag,
 				Type.HEADER);
 	}
 
-	public static final RiakReadParameter ifModifiedSince(Date date) {
-		return new RiakReadParameter(HttpHeaders.IF_MODIFIED_SINCE,
+	public static final RiakPutParameter ifMatch(String etag) {
+		return new RiakPutParameter(HttpHeaders.IF_MATCH, etag, Type.HEADER);
+	}
+
+	public static final RiakPutParameter ifModifiedSince(Date date) {
+		return new RiakPutParameter(HttpHeaders.IF_MODIFIED_SINCE,
 				DateTimeFormat.forPattern(HttpHeaders.DATE_PATTERN).print(
 						new DateTime(date).toDateTime(DateTimeZone.UTC)),
 				Type.HEADER);
 	}
+
+	public static final RiakPutParameter ifUnmodifiedSince(Date date) {
+		return new RiakPutParameter(HttpHeaders.IF_UNMODIFIED_SINCE,
+				DateTimeFormat.forPattern(HttpHeaders.DATE_PATTERN).print(
+						new DateTime(date).toDateTime(DateTimeZone.UTC)),
+				Type.HEADER);
+	}
+
 }

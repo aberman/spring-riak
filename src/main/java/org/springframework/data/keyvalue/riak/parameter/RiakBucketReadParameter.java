@@ -17,7 +17,6 @@ package org.springframework.data.keyvalue.riak.parameter;
 
 import org.springframework.data.keyvalue.riak.util.RiakConstants;
 
-
 /**
  * @author Andrew Berman
  * 
@@ -28,7 +27,7 @@ public class RiakBucketReadParameter extends RiakParameter {
 	 * @param value
 	 */
 	private RiakBucketReadParameter(String key, String value) {
-		super(key, value);
+		super(key, value, Type.QUERY);
 	}
 
 	/**
