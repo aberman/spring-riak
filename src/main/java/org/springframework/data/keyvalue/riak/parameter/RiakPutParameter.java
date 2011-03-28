@@ -21,7 +21,7 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.springframework.data.keyvalue.riak.client.data.RiakQuorumValue;
-import org.springframework.data.keyvalue.riak.util.HttpHeaders;
+import org.springframework.data.keyvalue.riak.client.http.HttpHeaders;
 import org.springframework.data.keyvalue.riak.util.RiakConstants;
 
 /**

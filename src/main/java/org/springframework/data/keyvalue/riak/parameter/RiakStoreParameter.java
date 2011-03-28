@@ -17,7 +17,7 @@ package org.springframework.data.keyvalue.riak.parameter;
 
 import org.springframework.data.keyvalue.riak.client.data.RiakLink;
 import org.springframework.data.keyvalue.riak.client.data.RiakQuorumValue;
-import org.springframework.data.keyvalue.riak.util.HttpHeaders;
+import org.springframework.data.keyvalue.riak.client.http.HttpHeaders;
 import org.springframework.data.keyvalue.riak.util.RiakConstants;
 
 /**
@@ -56,6 +56,11 @@ public class RiakStoreParameter extends RiakParameter {
 
 	public static final RiakStoreParameter link(RiakLink link) {
 		return new RiakStoreParameter(HttpHeaders.LINK, link.toString(),
+				Type.HEADER);
+	}
+	
+	public static final RiakStoreParameter clientId(String clientId) {
+		return new RiakStoreParameter(HttpHeaders.X_RIAK_CLIENT_ID, clientId,
 				Type.HEADER);
 	}
 

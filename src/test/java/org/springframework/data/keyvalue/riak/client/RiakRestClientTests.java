@@ -22,8 +22,10 @@ import java.util.List;
 
 import org.springframework.data.keyvalue.riak.client.data.RiakBucket;
 import org.springframework.data.keyvalue.riak.client.data.RiakBucketProperty;
+import org.springframework.data.keyvalue.riak.client.data.RiakLink;
 import org.springframework.data.keyvalue.riak.client.data.RiakResponse;
 import org.springframework.data.keyvalue.riak.mapreduce.RiakJavascriptFunction;
+import org.springframework.data.keyvalue.riak.mapreduce.RiakLinkPhase;
 import org.springframework.data.keyvalue.riak.mapreduce.RiakMapReduceJob;
 import org.springframework.data.keyvalue.riak.mapreduce.filter.RiakKeyFilterRestrictions;
 import org.springframework.data.keyvalue.riak.parameter.RiakBucketReadParameter;
@@ -48,6 +50,8 @@ public class RiakRestClientTests {
 
 	public static final String TEST_VALUE = "this is a test value";
 
+	public static final boolean ENABLED = false;
+
 	@BeforeClass
 	public static void setUp() {
 		restClient = new RiakRestClient("localhost", 8098, false);
@@ -68,12 +72,12 @@ public class RiakRestClientTests {
 	/*
 	 * Bucket tests
 	 */
-	@Test(groups = { "bucket", "read" }, enabled = true)
+	@Test(groups = { "bucket", "read" }, enabled = ENABLED)
 	public void listBucketsTest() {
 		assertNotNull(restClient.listBuckets());
 	}
 
-	@Test(groups = { "bucket", "read" }, enabled = true)
+	@Test(groups = { "bucket", "read" }, enabled = ENABLED)
 	public void getBucketInformationTest() {
 		RiakBucket bucket = restClient
 				.getBucketInformation(TEST_BUCKET, RiakBucketReadParameter
@@ -84,7 +88,7 @@ public class RiakRestClientTests {
 		assertNotNull(bucket.getKeys());
 	}
 
-	@Test(groups = { "bucket", "write" }, enabled = true)
+	@Test(groups = { "bucket", "write" }, enabled = ENABLED)
 	public void setBucketInformationTest() {
 		restClient.setBucketProperties(TEST_BUCKET,
 				RiakBucketProperty.allowMulti(true));
@@ -98,7 +102,7 @@ public class RiakRestClientTests {
 	/*
 	 * Key Value Tests
 	 */
-	@Test(groups = { "keyValue", "read" }, enabled = true)
+	@Test(groups = { "keyValue", "read" }, enabled = ENABLED)
 	public void getValueTest() {
 		RiakResponse<String> response = restClient.getValue(TEST_BUCKET,
 				TEST_KEY, String.class);
@@ -106,7 +110,7 @@ public class RiakRestClientTests {
 		assertEquals(response.getData(), TEST_VALUE);
 	}
 
-	@Test(groups = { "keyValue", "write" }, enabled = true)
+	@Test(groups = { "keyValue", "write" }, enabled = ENABLED)
 	public void storeKeyValueTest() {
 		restClient.storeKeyValue(TEST_BUCKET, TEST_KEY, "foo test");
 		RiakResponse<String> response = restClient.getValue(TEST_BUCKET,
@@ -115,16 +119,17 @@ public class RiakRestClientTests {
 		assertEquals(response.getData(), "foo test");
 	}
 
-	@Test(groups = { "keyValue", "write" }, enabled = true)
+	@Test(groups = { "keyValue", "write" }, enabled = ENABLED)
 	public void storeValueTest() {
-		String key = restClient.storeValue(TEST_BUCKET, "bar test", RiakStoreParameter.metaDataHeader("Some meta data"));
+		String key = restClient.storeValue(TEST_BUCKET, "bar test",
+				RiakStoreParameter.metaDataHeader("Some meta data"));
 		RiakResponse<String> response = restClient.getValue(TEST_BUCKET, key,
 				String.class);
 		assertNotNull(response);
 		assertEquals(response.getData(), "bar test");
 	}
 
-	@Test(groups = { "keyValue", "delete" }, enabled = true)
+	@Test(groups = { "keyValue", "delete" }, enabled = ENABLED)
 	public void deleteKeyTest() {
 		String key = restClient.storeValue(TEST_BUCKET, "foo");
 		RiakResponse<String> response = restClient.getValue(TEST_BUCKET, key,
@@ -138,7 +143,7 @@ public class RiakRestClientTests {
 	/*
 	 * Map/Reduce Test
 	 */
-	@Test(enabled = true)
+	@Test(enabled = ENABLED)
 	public void mapReduceKeyFilterTest() throws Exception {
 		RiakResponse<List<String>> response = restClient.executeMapReduceJob(
 				new RiakMapReduceJob(TEST_BUCKET, RiakKeyFilterRestrictions
@@ -149,5 +154,30 @@ public class RiakRestClientTests {
 		assertNotNull(response);
 		assertNotNull(response.getData());
 		assertEquals(response.getData().get(0), TEST_VALUE);
+	}
+
+	/*
+	 * Link test
+	 */
+	@Test
+	public void linkTest() {
+		String id = restClient.storeValue(TEST_BUCKET, "Value 1");
+		String id2 = restClient.storeValue(TEST_BUCKET, "Value 2");
+		String id3 = restClient
+				.storeValue(TEST_BUCKET, "Value 3", RiakStoreParameter
+						.link(new RiakLink(TEST_BUCKET, id, "val1")),
+						RiakStoreParameter.link(new RiakLink(TEST_BUCKET, id2,
+								"val2")));
+		List<RiakResponse<String>> responses = restClient.walkLinks(
+				TEST_BUCKET, id3, String.class, new RiakLinkPhase(TEST_BUCKET,
+						null, true));
+		assertNotNull(responses);
+
+		for (RiakResponse<String> response : responses) {
+			if (response.getId().equals(id))
+				assertEquals(response.getData(), "Value 1");
+			else
+				assertEquals(response.getData(), "Value 2");
+		}
 	}
 }

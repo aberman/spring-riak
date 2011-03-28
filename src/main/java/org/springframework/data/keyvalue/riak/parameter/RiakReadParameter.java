@@ -21,7 +21,8 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.springframework.data.keyvalue.riak.client.data.RiakQuorumValue;
-import org.springframework.data.keyvalue.riak.util.HttpHeaders;
+import org.springframework.data.keyvalue.riak.client.http.HttpHeaders;
+import org.springframework.data.keyvalue.riak.client.http.MIMEType;
 import org.springframework.data.keyvalue.riak.util.RiakConstants;
 
 /**
@@ -29,8 +30,6 @@ import org.springframework.data.keyvalue.riak.util.RiakConstants;
  * 
  */
 public class RiakReadParameter extends RiakParameter {
-
-	private static final String MULTIPART_MIXED = "multipart/mixed";
 
 	/**
 	 * @param key
@@ -50,7 +49,8 @@ public class RiakReadParameter extends RiakParameter {
 	}
 
 	public static final RiakReadParameter returnAllSiblings = new RiakReadParameter(
-			HttpHeaders.ACCEPT, MULTIPART_MIXED, Type.HEADER);
+			HttpHeaders.ACCEPT, MIMEType.MULTIPART_MIXED.toString(),
+			Type.HEADER);
 
 	public static final RiakReadParameter ifNoneMatch(String etag) {
 		return new RiakReadParameter(HttpHeaders.IF_NONE_MATCH, etag,

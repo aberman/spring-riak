@@ -18,11 +18,30 @@ package org.springframework.data.keyvalue.riak.mapreduce;
 
 /**
  * @author Andrew Berman
- *
+ * 
  */
 public class RiakErlangFunction extends RiakMapReduceFunction {
 
-	public RiakErlangFunction() {
+	private String module;
+
+	private String function;
+
+	private RiakErlangFunction(String module, String function) {
 		super(Language.ERLANG);
+		this.module = module;
+		this.function = function;
+	}
+
+	public String getModule() {
+		return module;
+	}
+	
+	public String getFunction() {
+		return function;
+	}
+
+	public static final RiakErlangFunction function(String module,
+			String function) {
+		return new RiakErlangFunction(module, function);
 	}
 }

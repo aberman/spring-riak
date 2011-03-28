@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.keyvalue.riak.util;
+package org.springframework.data.keyvalue.riak.client.http;
 
 import java.util.Map;
+
+import org.springframework.data.keyvalue.riak.util.RiakExtraInfo;
 
 /**
  * @author Andrew Berman
@@ -32,11 +34,16 @@ public class HttpHeaders extends org.springframework.http.HttpHeaders implements
 	public static final String X_RIAK_VCLOCK = "X-Riak-Vclock";
 	public static final String IF_MATCH = "If-Match";
 	public static final String IF_UNMODIFIED_SINCE = "If-Unmodified-Since";
+	public static final String X_RIAK_CLIENT_ID = "X-Riak-ClientId";
 
 	public HttpHeaders(org.springframework.http.HttpHeaders headers) {
 		super();
 		this.putAll(org.springframework.http.HttpHeaders
 				.readOnlyHttpHeaders(headers));
+	}
+	
+	public HttpHeaders() {
+		super();
 	}
 
 	@Override

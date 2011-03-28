@@ -15,9 +15,9 @@
  */
 package org.springframework.data.keyvalue.riak.client.data;
 
-import org.springframework.data.keyvalue.riak.util.HttpHeaders;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.data.keyvalue.riak.client.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.Assert;
 
 /**
  * @author Andrew Berman
@@ -32,18 +32,23 @@ public class RiakRestResponse<T> implements RiakResponse<T> {
 	private T data;
 	private HttpHeaders extraInfo;
 	private String responseStatus;
+	private String id;
 
 	public RiakRestResponse(ResponseEntity<T> re) {
-		Assert.notNull(re, "ResponseEntity cannot be null");
-		this.data = re.getBody();
-		this.extraInfo = new HttpHeaders(re.getHeaders());
-		this.responseStatus = re.getStatusCode().toString();
+		this(re.getBody(), new HttpHeaders(re.getHeaders()), re.getStatusCode()
+				.toString());
+	}
+
+	public static final String parseLocationForId(String location) {
+		String[] split = StringUtils.split(location, "/");
+		return split[split.length - 1];
 	}
 
 	public RiakRestResponse(T data, HttpHeaders extraInfo, String responseStatus) {
 		this.data = data;
 		this.extraInfo = extraInfo;
 		this.responseStatus = responseStatus;
+		this.id = parseLocationForId(extraInfo.getLocation().getPath());
 	}
 
 	@Override
@@ -60,4 +65,10 @@ public class RiakRestResponse<T> implements RiakResponse<T> {
 	public String getResponseStatus() {
 		return this.responseStatus;
 	}
+
+	@Override
+	public String getId() {
+		return this.id;
+	}
+
 }

@@ -21,7 +21,6 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.data.keyvalue.riak.client.data.ResultCallbackHandler;
 import org.springframework.data.keyvalue.riak.client.data.RiakBucket;
 import org.springframework.data.keyvalue.riak.client.data.RiakBucketProperty;
-import org.springframework.data.keyvalue.riak.client.data.RiakLink;
 import org.springframework.data.keyvalue.riak.client.data.RiakResponse;
 import org.springframework.data.keyvalue.riak.mapreduce.RiakLinkPhase;
 import org.springframework.data.keyvalue.riak.mapreduce.RiakMapReduceJob;
@@ -37,6 +36,13 @@ import org.springframework.data.keyvalue.riak.parameter.RiakStoreParameter;
  * 
  */
 public interface RiakManager extends InitializingBean {
+	/*
+	 * Server operations
+	 */
+	boolean ping() throws RiakClientException;
+
+	void stats() throws RiakClientException;
+
 	/*
 	 * Bucket operations
 	 */
@@ -60,13 +66,6 @@ public interface RiakManager extends InitializingBean {
 	String storeValue(String bucket, Object value, RiakStoreParameter... params)
 			throws RiakClientException;
 
-	void storeKeyValue(String bucket, String key, Object value,
-			List<RiakLink> links, RiakStoreParameter... params)
-			throws RiakClientException;
-
-	String storeValue(String bucket, Object value, List<RiakLink> links,
-			RiakStoreParameter... params) throws RiakClientException;
-
 	void deleteKey(String bucket, String key, RiakDeleteParameter... params)
 			throws RiakClientException;
 
@@ -84,6 +83,6 @@ public interface RiakManager extends InitializingBean {
 	/*
 	 * Link operations
 	 */
-	<T> RiakResponse<T> walkLinks(String bucket, String key, Class<T> clazz,
-			RiakLinkPhase... phases) throws RiakClientException;
+	<T> List<RiakResponse<T>> walkLinks(String bucket, String key,
+			Class<T> clazz, RiakLinkPhase... phases) throws RiakClientException;
 }

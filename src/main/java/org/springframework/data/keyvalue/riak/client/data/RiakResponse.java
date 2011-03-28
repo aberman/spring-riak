@@ -24,6 +24,8 @@ import org.springframework.data.keyvalue.riak.util.RiakExtraInfo;
  * 
  */
 public interface RiakResponse<T> extends Serializable {
+	String getId();
+	
 	T getData();
 
 	RiakExtraInfo getExtraInfo();
