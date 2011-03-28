@@ -16,6 +16,7 @@
 package org.springframework.data.keyvalue.riak.client;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.data.keyvalue.riak.client.data.ResultCallbackHandler;
@@ -26,7 +27,6 @@ import org.springframework.data.keyvalue.riak.mapreduce.RiakLinkPhase;
 import org.springframework.data.keyvalue.riak.mapreduce.RiakMapReduceJob;
 import org.springframework.data.keyvalue.riak.parameter.RiakBucketReadParameter;
 import org.springframework.data.keyvalue.riak.parameter.RiakDeleteParameter;
-import org.springframework.data.keyvalue.riak.parameter.RiakMapReduceParameter;
 import org.springframework.data.keyvalue.riak.parameter.RiakPutParameter;
 import org.springframework.data.keyvalue.riak.parameter.RiakReadParameter;
 import org.springframework.data.keyvalue.riak.parameter.RiakStoreParameter;
@@ -39,50 +39,48 @@ public interface RiakManager extends InitializingBean {
 	/*
 	 * Server operations
 	 */
-	boolean ping() throws RiakClientException;
+	boolean ping() throws RiakException;
 
-	void stats() throws RiakClientException;
+	Map<String, Object> stats() throws RiakException;
 
 	/*
 	 * Bucket operations
 	 */
-	List<String> listBuckets() throws RiakClientException;
+	List<String> listBuckets() throws RiakException;
 
 	RiakBucket getBucketInformation(String bucket,
-			RiakBucketReadParameter... params) throws RiakClientException;
+			RiakBucketReadParameter... params) throws RiakException;
 
 	void setBucketProperties(String bucket, RiakBucketProperty<?>... property)
-			throws RiakClientException;
+			throws RiakException;
 
 	/*
 	 * Key/Value operations
 	 */
 	<T> RiakResponse<T> getValue(String bucket, String key, Class<T> clazz,
-			RiakReadParameter... params) throws RiakClientException;
+			RiakReadParameter... params) throws RiakException;
 
 	void storeKeyValue(String bucket, String key, Object value,
-			RiakPutParameter... params) throws RiakClientException;
+			RiakPutParameter... params) throws RiakException;
 
 	String storeValue(String bucket, Object value, RiakStoreParameter... params)
-			throws RiakClientException;
+			throws RiakException;
 
 	void deleteKey(String bucket, String key, RiakDeleteParameter... params)
-			throws RiakClientException;
+			throws RiakException;
 
 	/*
 	 * Map/Reduce operations
 	 */
 	<T> RiakResponse<List<T>> executeMapReduceJob(RiakMapReduceJob job,
-			Class<T> clazz, RiakMapReduceParameter... params)
-			throws RiakClientException;
+			Class<T> clazz) throws RiakException;
 
 	void executeMapReduceJob(RiakMapReduceJob job,
-			ResultCallbackHandler callback, RiakMapReduceParameter... params)
-			throws RiakClientException;
+			ResultCallbackHandler callback) throws RiakException;
 
 	/*
 	 * Link operations
 	 */
 	<T> List<RiakResponse<T>> walkLinks(String bucket, String key,
-			Class<T> clazz, RiakLinkPhase... phases) throws RiakClientException;
+			Class<T> clazz, RiakLinkPhase... phases) throws RiakException;
 }

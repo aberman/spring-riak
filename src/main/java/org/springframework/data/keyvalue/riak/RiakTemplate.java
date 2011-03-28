@@ -20,7 +20,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.codehaus.jackson.map.ObjectMapper;
-import org.springframework.data.keyvalue.riak.client.RiakClientException;
+import org.springframework.data.keyvalue.riak.client.RiakException;
 import org.springframework.data.keyvalue.riak.client.RiakManager;
 import org.springframework.data.keyvalue.riak.client.data.RiakBucket;
 import org.springframework.data.keyvalue.riak.client.data.RiakResponse;
@@ -73,8 +73,8 @@ public class RiakTemplate extends RiakAccessor implements RiakOperations {
 		try {
 			RiakResponse<T> response = getRiakManager().getValue(bucket, key,
 					entityClass);
-			return response.getData();
-		} catch (RiakClientException e) {
+			return response.getBody();
+		} catch (RiakException e) {
 			return null;
 		} catch (Exception e) {
 			throw new RuntimeException(
@@ -320,7 +320,7 @@ public class RiakTemplate extends RiakAccessor implements RiakOperations {
 
 		try {
 			return action.doInRiak(rm);
-		} catch (RiakClientException ex) {
+		} catch (RiakException ex) {
 			throw new RiakDataException(ex.getMessage(), ex);
 		}
 

@@ -57,12 +57,5 @@ public class RiakStoreParameter extends RiakParameter {
 	public static final RiakStoreParameter link(RiakLink link) {
 		return new RiakStoreParameter(HttpHeaders.LINK, link.toString(),
 				Type.HEADER);
-	}
-	
-	public static final RiakStoreParameter clientId(String clientId) {
-		return new RiakStoreParameter(HttpHeaders.X_RIAK_CLIENT_ID, clientId,
-				Type.HEADER);
-	}
-
-	
+	}	
 }

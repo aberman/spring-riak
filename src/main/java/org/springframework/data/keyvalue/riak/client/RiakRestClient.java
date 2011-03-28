@@ -19,27 +19,29 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.type.TypeFactory;
 import org.springframework.data.keyvalue.riak.client.data.ResultCallbackHandler;
 import org.springframework.data.keyvalue.riak.client.data.RiakBucket;
 import org.springframework.data.keyvalue.riak.client.data.RiakBucketProperties;
 import org.springframework.data.keyvalue.riak.client.data.RiakBucketProperty;
 import org.springframework.data.keyvalue.riak.client.data.RiakResponse;
 import org.springframework.data.keyvalue.riak.client.data.RiakRestResponse;
+import org.springframework.data.keyvalue.riak.client.http.HttpHeaders;
 import org.springframework.data.keyvalue.riak.client.http.MultipartMixedHttpMessageConverter;
 import org.springframework.data.keyvalue.riak.mapreduce.RiakLinkPhase;
 import org.springframework.data.keyvalue.riak.mapreduce.RiakMapReduceJob;
 import org.springframework.data.keyvalue.riak.parameter.RiakBucketReadParameter;
 import org.springframework.data.keyvalue.riak.parameter.RiakDeleteParameter;
-import org.springframework.data.keyvalue.riak.parameter.RiakMapReduceParameter;
 import org.springframework.data.keyvalue.riak.parameter.RiakParameter;
 import org.springframework.data.keyvalue.riak.parameter.RiakParameter.Type;
 import org.springframework.data.keyvalue.riak.parameter.RiakPutParameter;
@@ -49,10 +51,12 @@ import org.springframework.data.keyvalue.riak.util.RiakConstants;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
@@ -70,7 +74,19 @@ public class RiakRestClient implements RiakManager {
 
 	private boolean useSSL = false;
 
+	private String clientId = RandomStringUtils.randomAlphanumeric(10);
+
 	private static RestTemplate restTemplate = new RestTemplate();
+
+	private static final ObjectMapper mapper = new ObjectMapper();
+
+	private static final String RIAK_PATH = "riak";
+
+	private static final String RIAK_MAP_RED_PATH = "mapred";
+
+	private static final String RIAK_PING = "ping";
+
+	private static final String RIAK_STATS = "stats";
 
 	public RiakRestClient() {
 	}
@@ -123,18 +139,74 @@ public class RiakRestClient implements RiakManager {
 		this.port = port;
 	}
 
-	private String buildUrl(List<String> path,
-			Collection<RiakParameter> queryParams) {
-		try {
-			return new URI(isUseSSL() ? "https" : "http", null, this.host,
-					this.port, "/" + StringUtils.join(path, "/"),
-					queryParams != null && !queryParams.isEmpty() ? StringUtils
-							.join(queryParams, "&") : null, null).toString();
-		} catch (URISyntaxException e) {
-			// should never happen
-			logger.fatal("Error formatting the URI");
-			throw new RiakClientException("Error formatting the URI", e);
+	public String getClientId() {
+		return clientId;
+	}
+
+	public void setClientId(String clientId) {
+		this.clientId = clientId;
+	}
+
+	private MultiValueMap<String, String> getHeadersMap(
+			RiakParameter... parameters) {
+		MultiValueMap<String, String> headerMap = new LinkedMultiValueMap<String, String>();
+		headerMap.add(HttpHeaders.X_RIAK_CLIENT_ID, getClientId());
+		if (parameters != null && parameters.length > 0) {
+			for (RiakParameter param : parameters) {
+				if (param.getType().equals(Type.HEADER))
+					headerMap.add(param.getKey(), param.getValue());
+			}
 		}
+
+		return headerMap;
+	}
+
+	private <T> ResponseEntity<T> execute(String path, HttpMethod method,
+			Object value, RiakParameter[] parameters, Class<T> clazz,
+			String... pathParams) throws RiakException {
+		try {
+			if (value == null)
+				return restTemplate.exchange(
+						getUrl(path, parameters, pathParams), method,
+						new HttpEntity<Object>(getHeadersMap(parameters)),
+						clazz);
+			else
+				return restTemplate
+						.exchange(getUrl(path, parameters, pathParams), method,
+								new HttpEntity<Object>(value,
+										getHeadersMap(parameters)), clazz);
+		} catch (RestClientException e) {
+			if (e instanceof HttpClientErrorException) {
+				// 400 error
+				HttpClientErrorException ex = (HttpClientErrorException) e;
+				if (ex.getStatusCode().equals(HttpStatus.NOT_FOUND))
+					throw new RiakObjectNotFoundException(
+							HttpStatus.NOT_FOUND.toString());
+
+				throw new RiakUncategorizedClientErrorException(
+						ex.getStatusText());
+			} else if (e instanceof HttpServerErrorException) {
+				// 500 error
+				HttpServerErrorException ex = (HttpServerErrorException) e;
+				throw new RiakServerErrorException(ex.getStatusText());
+			}
+
+			throw new RiakUncategorizedException(
+					"Uncategorized exception thrown", e);
+		}
+	}
+
+	private <T> ResponseEntity<T> executeRiak(HttpMethod method, Object value,
+			RiakParameter[] parameters, Class<T> clazz, String... pathParams)
+			throws RiakException {
+		return execute(RIAK_PATH, method, value, parameters, clazz, pathParams);
+	}
+
+	private <T> ResponseEntity<T> executeMapReduce(HttpMethod method,
+			Object value, RiakParameter[] parameters, Class<T> clazz,
+			String... pathParams) throws RiakException {
+		return execute(RIAK_MAP_RED_PATH, method, value, parameters, clazz,
+				pathParams);
 	}
 
 	private String getUrl(String basePath, RiakParameter[] parameters,
@@ -155,156 +227,96 @@ public class RiakRestClient implements RiakManager {
 			}
 		}
 
-		return buildUrl(params, queryParams);
-	}
-
-	private String getRiakUrl(RiakParameter[] parameters, String... pathParams) {
-		return getUrl("riak", parameters, pathParams);
-	}
-
-	private String getMapReduceUrl(RiakParameter[] params, String... pathParams) {
-		return getUrl("mapred", params, pathParams);
-	}
-
-	@Override
-	public boolean ping() throws RiakClientException {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void stats() throws RiakClientException {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public List<String> listBuckets() throws RiakClientException {
 		try {
-			Map<?, ?> map = restTemplate.getForObject(
-					getRiakUrl(null).concat("?buckets=true"), Map.class);
-
-			if (map != null && !map.isEmpty()) {
-				List<?> buckets = (List<?>) map.get("buckets");
-				List<String> bucketNames = new ArrayList<String>();
-				for (Iterator<?> it = buckets.iterator(); it.hasNext();)
-					bucketNames.add((String) it.next());
-
-				return bucketNames;
-			}
-
-			return null;
-		} catch (RestClientException e) {
-			throw new RiakClientException(e.getMessage(), e);
+			return new URI(isUseSSL() ? "https" : "http", null, this.host,
+					this.port, "/" + StringUtils.join(params, "/"),
+					queryParams != null && !queryParams.isEmpty() ? StringUtils
+							.join(queryParams, "&") : null, null).toString();
+		} catch (URISyntaxException e) {
+			// should never happen
+			logger.fatal("Error formatting the URI");
+			throw new RiakUncategorizedException("Error formatting the URI", e);
 		}
+	}
+
+	@Override
+	public boolean ping() throws RiakException {
+		ResponseEntity<String> re = execute(RIAK_PING, HttpMethod.GET, null,
+				null, String.class);
+		return re.getStatusCode().equals(HttpStatus.OK);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public Map<String, Object> stats() throws RiakException {
+		return execute(RIAK_STATS, HttpMethod.GET, null, null, Map.class)
+				.getBody();
+	}
+
+	@Override
+	public List<String> listBuckets() throws RiakException {
+		Map<?, ?> map = executeRiak(
+				HttpMethod.GET,
+				null,
+				new RiakParameter[] { new RiakParameter("buckets", "true",
+						Type.QUERY) }, Map.class).getBody();
+
+		if (map != null && !map.isEmpty()) {
+			List<?> buckets = (List<?>) map.get("buckets");
+			List<String> bucketNames = new ArrayList<String>();
+			for (Iterator<?> it = buckets.iterator(); it.hasNext();)
+				bucketNames.add((String) it.next());
+
+			return bucketNames;
+		}
+
+		return null;
 	}
 
 	@Override
 	public RiakBucket getBucketInformation(String bucket,
-			RiakBucketReadParameter... params) throws RiakClientException {
-		try {
-			return restTemplate.getForObject(getRiakUrl(params, bucket)
-					.toString(), RiakBucket.class);
-		} catch (RestClientException e) {
-			throw new RiakClientException(e.getMessage(), e);
-		}
-	}
-
-	private MultiValueMap<String, String> getHeadersMap(
-			RiakParameter... parameters) {
-		MultiValueMap<String, String> headerMap = null;
-		if (parameters != null && parameters.length > 0) {
-			headerMap = new LinkedMultiValueMap<String, String>();
-
-			for (RiakParameter param : parameters) {
-				if (param.getType().equals(Type.HEADER))
-					headerMap.add(param.getKey(), param.getValue());
-			}
-		}
-
-		return headerMap;
+			RiakBucketReadParameter... params) throws RiakException {
+		return executeRiak(HttpMethod.GET, null, params, RiakBucket.class,
+				bucket).getBody();
 	}
 
 	@Override
 	public void setBucketProperties(String bucket,
-			RiakBucketProperty<?>... bucketProperties)
-			throws RiakClientException {
+			RiakBucketProperty<?>... bucketProperties) throws RiakException {
 		Assert.notNull(bucket, "The bucket cannot be null");
 		Assert.notNull(bucketProperties,
 				"At least one bucket property must be set");
+		executeRiak(HttpMethod.PUT,
+				Collections.singletonMap(RiakConstants.PROPS,
+						new RiakBucketProperties(bucketProperties)), null,
+				byte[].class, bucket);
 
-		try {
-			restTemplate.put(getRiakUrl((RiakParameter[]) null, bucket),
-					Collections.singletonMap(RiakConstants.PROPS,
-							new RiakBucketProperties(bucketProperties)));
-		} catch (RestClientException e) {
-			throw new RiakClientException(e.getMessage(), e);
-		}
 	}
 
 	@Override
 	public <T> RiakResponse<T> getValue(String bucket, String key,
-			Class<T> clazz, RiakReadParameter... params)
-			throws RiakClientException {
-		try {
-			return new RiakRestResponse<T>(restTemplate.exchange(
-					getRiakUrl(params, bucket, key), HttpMethod.GET,
-					new HttpEntity<T>(getHeadersMap(params)), clazz));
-		} catch (RestClientException e) {
-			HttpClientErrorException ex = (HttpClientErrorException) e;
-			if (!ex.getStatusCode().equals(HttpStatus.NOT_FOUND))
-				throw new RiakClientException(e.getMessage(), e);
-
-			return null;
-		}
-	}
-
-	private void storeKeyValueCommon(String bucket, String key, Object value,
-			RiakParameter... params) throws RiakClientException {
-		try {
-			restTemplate.exchange(getRiakUrl(params, bucket, key),
-					HttpMethod.PUT, new HttpEntity<Object>(value,
-							getHeadersMap(params)), value.getClass());
-		} catch (RestClientException e) {
-			throw new RiakClientException(e.getMessage(), e);
-		}
+			Class<T> clazz, RiakReadParameter... params) throws RiakException {
+		return new RiakRestResponse<T>(executeRiak(HttpMethod.GET, null,
+				params, clazz, bucket, key), key);
 	}
 
 	@Override
 	public void storeKeyValue(String bucket, String key, Object value,
-			RiakPutParameter... params) throws RiakClientException {
-		this.storeKeyValueCommon(bucket, key, value, params);
+			RiakPutParameter... params) throws RiakException {
+		executeRiak(HttpMethod.PUT, value, params, byte[].class, bucket, key);
 	}
 
 	@Override
 	public String storeValue(String bucket, Object value,
-			RiakStoreParameter... params) throws RiakClientException {
-		try {
-			return RiakRestResponse
-					.parseLocationForId(restTemplate
-							.exchange(
-									getRiakUrl(params, bucket),
-									HttpMethod.POST,
-									new HttpEntity<Object>(value,
-											getHeadersMap(params)),
-									value.getClass()).getHeaders()
-							.getLocation().getPath());
-		} catch (RestClientException e) {
-			throw new RiakClientException(e.getMessage(), e);
-		}
+			RiakStoreParameter... params) throws RiakException {
+		return new RiakRestResponse<byte[]>(executeRiak(HttpMethod.POST, value,
+				params, byte[].class, bucket)).getKey();
 	}
 
 	@Override
 	public void deleteKey(String bucket, String key,
-			RiakDeleteParameter... params) throws RiakClientException {
-		try {
-			restTemplate.exchange(getRiakUrl(params, bucket, key),
-					HttpMethod.DELETE, new HttpEntity<Object>(
-							getHeadersMap(params)), null);
-		} catch (RestClientException e) {
-			throw new RiakClientException(e.getMessage(), e);
-		}
-
+			RiakDeleteParameter... params) throws RiakException {
+		executeRiak(HttpMethod.DELETE, null, params, byte[].class, bucket, key);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -313,15 +325,20 @@ public class RiakRestClient implements RiakManager {
 
 		private RiakResponse<List<T>> returnResponse;
 
+		private Class<T> clazz;
+
+		public RiakResponseCallbackHandler(Class<T> clazz) {
+			this.clazz = clazz;
+		}
+
 		@Override
 		public void processResult(RiakResponse<Object[]> response) {
-			if (response.getData().length > 0) {
-				List<T> tList = new ArrayList<T>();
-				for (Object o : response.getData())
-					tList.add((T) o);
-
-				this.returnResponse = new RiakRestResponse<List<T>>(tList,
-						((RiakRestResponse<Object[]>) response).getExtraInfo(),
+			if (response.getBody().length > 0) {
+				this.returnResponse = new RiakRestResponse<List<T>>(
+						(List<T>) mapper.convertValue(response.getBody(),
+								TypeFactory.collectionType(List.class,
+										this.clazz)),
+						(HttpHeaders) response.getExtraInfo(),
 						response.getResponseStatus());
 			}
 		}
@@ -333,27 +350,24 @@ public class RiakRestClient implements RiakManager {
 
 	@Override
 	public <T> RiakResponse<List<T>> executeMapReduceJob(RiakMapReduceJob job,
-			Class<T> clazz, RiakMapReduceParameter... params)
-			throws RiakClientException {
-		RiakResponseCallbackHandler<T> callback = new RiakResponseCallbackHandler<T>();
-		executeMapReduceJob(job, callback, params);
+			Class<T> clazz) throws RiakException {
+		RiakResponseCallbackHandler<T> callback = new RiakResponseCallbackHandler<T>(
+				clazz);
+		executeMapReduceJob(job, callback);
 		return callback.getResponse();
 	}
 
 	@Override
 	public void executeMapReduceJob(RiakMapReduceJob job,
-			ResultCallbackHandler callback, RiakMapReduceParameter... params)
-			throws RiakClientException {
-		callback.processResult(new RiakRestResponse<Object[]>(restTemplate
-				.exchange(getMapReduceUrl(params), HttpMethod.POST,
-						new HttpEntity<RiakMapReduceJob>(job,
-								getHeadersMap(params)), Object[].class)));
+			ResultCallbackHandler callback) throws RiakException {
+		callback.processResult(new RiakRestResponse<Object[]>(executeMapReduce(
+				HttpMethod.POST, job, null, Object[].class)));
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T> List<RiakResponse<T>> walkLinks(String bucket, String key,
-			Class<T> clazz, RiakLinkPhase... phases) throws RiakClientException {
+			Class<T> clazz, RiakLinkPhase... phases) throws RiakException {
 		List<String> pathParams = new ArrayList<String>(Arrays.asList(bucket,
 				key));
 
@@ -363,7 +377,7 @@ public class RiakRestClient implements RiakManager {
 		privTemp.getMessageConverters().add(
 				new MultipartMixedHttpMessageConverter<T>(clazz));
 		return (List<RiakResponse<T>>) privTemp.getForObject(
-				getRiakUrl(null, (String[]) pathParams
+				getUrl("riak", null, (String[]) pathParams
 						.toArray(new String[pathParams.size()])), List.class);
 	}
 

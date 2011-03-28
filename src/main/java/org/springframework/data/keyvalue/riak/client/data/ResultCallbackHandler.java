@@ -15,9 +15,10 @@
  */
 package org.springframework.data.keyvalue.riak.client.data;
 
+
 /**
  * @author andrewberman
- *
+ * 
  */
 public interface ResultCallbackHandler {
 	void processResult(RiakResponse<Object[]> response);

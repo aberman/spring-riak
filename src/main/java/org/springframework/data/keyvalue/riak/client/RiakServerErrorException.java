@@ -15,32 +15,19 @@
  */
 package org.springframework.data.keyvalue.riak.client;
 
-import org.springframework.core.NestedRuntimeException;
-
 /**
- * @author Andrew Berman
+ * @author andrewberman
  *
  */
-public class RiakClientException extends NestedRuntimeException {
+public class RiakServerErrorException extends RiakStatusException {
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 2476145342385124462L;
+	private static final long serialVersionUID = -5829794160937776058L;
 
-	/**
-	 * @param msg
-	 * @param cause
-	 */
-	public RiakClientException(String msg, Throwable cause) {
-		super(msg, cause);
-	}
-	
-	/**
-	 * @param msg
-	 */
-	public RiakClientException(String msg) {
-		super(msg);
+	public RiakServerErrorException(String status) {
+		super(status);
 	}
 
 }

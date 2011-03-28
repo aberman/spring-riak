@@ -15,7 +15,7 @@
  */
 package org.springframework.data.keyvalue.riak;
 
-import org.springframework.data.keyvalue.riak.client.RiakClientException;
+import org.springframework.data.keyvalue.riak.client.RiakException;
 import org.springframework.data.keyvalue.riak.client.RiakManager;
 
 /**
@@ -24,5 +24,5 @@ import org.springframework.data.keyvalue.riak.client.RiakManager;
  */
 public interface RiakCallback<T> {
 
-	T doInRiak(RiakManager rm) throws RiakClientException;
+	T doInRiak(RiakManager rm) throws RiakException;
 }

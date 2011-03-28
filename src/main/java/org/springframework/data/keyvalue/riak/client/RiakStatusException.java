@@ -13,44 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.keyvalue.riak.parameter;
-
+package org.springframework.data.keyvalue.riak.client;
 
 /**
- * @author Andrew Berman
- * 
+ * @author andrewberman
+ *
  */
-public class RiakParameter {
-	private String key;
+public abstract class RiakStatusException extends RiakException {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -6458733000971995666L;
+	private String status;
 
-	private String value;
-
-	private Type type;
-
-	public enum Type {
-		QUERY, HEADER
+	public RiakStatusException(String status) {
+		super(status);
 	}
 
-	public RiakParameter(String key, String value, Type type) {
-		this.key = key;
-		this.value = value;
-		this.type = type;
-	}
-
-	public String getKey() {
-		return key;
-	}
-
-	public String getValue() {
-		return value;
-	}
-
-	public Type getType() {
-		return type;
-	}
-
-	@Override
-	public String toString() {
-		return key + "=" + value;
+	public String getStatus() {
+		return status;
 	}
 }

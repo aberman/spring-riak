@@ -19,6 +19,7 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.keyvalue.riak.client.data.RiakBucket;
 import org.springframework.data.keyvalue.riak.client.data.RiakBucketProperty;
@@ -50,7 +51,7 @@ public class RiakRestClientTests {
 
 	public static final String TEST_VALUE = "this is a test value";
 
-	public static final boolean ENABLED = false;
+	public static final boolean ENABLED = true;
 
 	@BeforeClass
 	public static void setUp() {
@@ -107,7 +108,7 @@ public class RiakRestClientTests {
 		RiakResponse<String> response = restClient.getValue(TEST_BUCKET,
 				TEST_KEY, String.class);
 		assertNotNull(response);
-		assertEquals(response.getData(), TEST_VALUE);
+		assertEquals(response.getBody(), TEST_VALUE);
 	}
 
 	@Test(groups = { "keyValue", "write" }, enabled = ENABLED)
@@ -116,7 +117,7 @@ public class RiakRestClientTests {
 		RiakResponse<String> response = restClient.getValue(TEST_BUCKET,
 				TEST_KEY, String.class);
 		assertNotNull(response);
-		assertEquals(response.getData(), "foo test");
+		assertEquals(response.getBody(), "foo test");
 	}
 
 	@Test(groups = { "keyValue", "write" }, enabled = ENABLED)
@@ -126,7 +127,7 @@ public class RiakRestClientTests {
 		RiakResponse<String> response = restClient.getValue(TEST_BUCKET, key,
 				String.class);
 		assertNotNull(response);
-		assertEquals(response.getData(), "bar test");
+		assertEquals(response.getBody(), "bar test");
 	}
 
 	@Test(groups = { "keyValue", "delete" }, enabled = ENABLED)
@@ -134,10 +135,14 @@ public class RiakRestClientTests {
 		String key = restClient.storeValue(TEST_BUCKET, "foo");
 		RiakResponse<String> response = restClient.getValue(TEST_BUCKET, key,
 				String.class);
-		assertNotNull(response.getData());
+		assertNotNull(response.getBody());
 		restClient.deleteKey(TEST_BUCKET, key);
-		response = restClient.getValue(TEST_BUCKET, key, String.class);
-		Assert.assertNull(response);
+		try {
+			response = restClient.getValue(TEST_BUCKET, key, String.class);
+			Assert.assertNull(response);
+		} catch (RiakObjectNotFoundException e) {
+			//Should happen
+		}
 	}
 
 	/*
@@ -152,8 +157,8 @@ public class RiakRestClientTests {
 								RiakJavascriptFunction.REDUCE_SORT),
 				String.class);
 		assertNotNull(response);
-		assertNotNull(response.getData());
-		assertEquals(response.getData().get(0), TEST_VALUE);
+		assertNotNull(response.getBody());
+		assertEquals(response.getBody().get(0), TEST_VALUE);
 	}
 
 	/*
@@ -174,10 +179,22 @@ public class RiakRestClientTests {
 		assertNotNull(responses);
 
 		for (RiakResponse<String> response : responses) {
-			if (response.getId().equals(id))
-				assertEquals(response.getData(), "Value 1");
+			if (response.getKey().equals(id))
+				assertEquals(response.getBody(), "Value 1");
 			else
-				assertEquals(response.getData(), "Value 2");
+				assertEquals(response.getBody(), "Value 2");
 		}
+	}
+
+	@Test
+	public void pingTest() {
+		assertEquals(restClient.ping(), true);
+	}
+
+	@Test
+	public void statsTest() {
+		Map<String, Object> map = restClient.stats();
+		assertNotNull(map);
+		Assert.assertTrue(map.size() > 1);
 	}
 }

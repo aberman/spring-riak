@@ -13,22 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.keyvalue.riak.parameter;
-
-import org.springframework.data.keyvalue.riak.util.RiakConstants;
+package org.springframework.data.keyvalue.riak.client;
 
 /**
- * @author Andrew Berman
+ * @author andrewberman
  * 
  */
-public class RiakMapReduceParameter extends RiakParameter {
+public abstract class RiakClientErrorException extends RiakStatusException {
 
-	private RiakMapReduceParameter(String key, String value) {
-		super(key, value, Type.QUERY);
-	}
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
-	public static final RiakMapReduceParameter chunked(boolean shouldChunk) {
-		return new RiakMapReduceParameter(RiakConstants.CHUNKED,
-				Boolean.toString(shouldChunk));
+	public RiakClientErrorException(String status) {
+		super(status);
 	}
+	
 }

@@ -29,31 +29,37 @@ public class RiakRestResponse<T> implements RiakResponse<T> {
 	 * 
 	 */
 	private static final long serialVersionUID = -4613049362224120711L;
-	private T data;
+	private T body;
 	private HttpHeaders extraInfo;
 	private String responseStatus;
-	private String id;
+	private String key;
 
 	public RiakRestResponse(ResponseEntity<T> re) {
 		this(re.getBody(), new HttpHeaders(re.getHeaders()), re.getStatusCode()
 				.toString());
 	}
 
-	public static final String parseLocationForId(String location) {
+	public static final String parseLocationForKey(String location) {
 		String[] split = StringUtils.split(location, "/");
 		return split[split.length - 1];
 	}
 
 	public RiakRestResponse(T data, HttpHeaders extraInfo, String responseStatus) {
-		this.data = data;
+		this.body = data;
 		this.extraInfo = extraInfo;
 		this.responseStatus = responseStatus;
-		this.id = parseLocationForId(extraInfo.getLocation().getPath());
+		this.key = extraInfo.getLocation() != null ? parseLocationForKey(extraInfo
+				.getLocation().getPath()) : null;
+	}
+
+	public RiakRestResponse(ResponseEntity<T> re, String key) {
+		this(re);
+		this.key = key;
 	}
 
 	@Override
-	public T getData() {
-		return this.data;
+	public T getBody() {
+		return this.body;
 	}
 
 	@Override
@@ -67,8 +73,8 @@ public class RiakRestResponse<T> implements RiakResponse<T> {
 	}
 
 	@Override
-	public String getId() {
-		return this.id;
+	public String getKey() {
+		return this.key;
 	}
 
 }

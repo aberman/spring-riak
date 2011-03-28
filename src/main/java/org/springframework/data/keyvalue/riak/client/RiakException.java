@@ -13,44 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.keyvalue.riak.parameter;
+package org.springframework.data.keyvalue.riak.client;
 
+import org.springframework.core.NestedRuntimeException;
 
 /**
  * @author Andrew Berman
- * 
+ *
  */
-public class RiakParameter {
-	private String key;
+public abstract class RiakException extends NestedRuntimeException {
 
-	private String value;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2476145342385124462L;
 
-	private Type type;
-
-	public enum Type {
-		QUERY, HEADER
+	/**
+	 * @param msg
+	 * @param cause
+	 */
+	public RiakException(String msg, Throwable cause) {
+		super(msg, cause);
+	}
+	
+	/**
+	 * @param msg
+	 */
+	public RiakException(String msg) {
+		super(msg);
 	}
 
-	public RiakParameter(String key, String value, Type type) {
-		this.key = key;
-		this.value = value;
-		this.type = type;
-	}
-
-	public String getKey() {
-		return key;
-	}
-
-	public String getValue() {
-		return value;
-	}
-
-	public Type getType() {
-		return type;
-	}
-
-	@Override
-	public String toString() {
-		return key + "=" + value;
-	}
 }

@@ -17,8 +17,8 @@ package org.springframework.data.keyvalue.riak.client.http;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Enumeration;
-import java.util.List;
 
 import javax.mail.BodyPart;
 import javax.mail.Header;
@@ -42,32 +42,31 @@ import org.springframework.http.converter.HttpMessageNotWritableException;
  * 
  */
 public class MultipartMixedHttpMessageConverter<T> extends
-		AbstractHttpMessageConverter<List<RiakResponse<T>>> {
+		AbstractHttpMessageConverter<Collection<RiakResponse<T>>> {
 
-	private Class<T> clazz;
+	private Class<T> contentClass;
 
 	private static ObjectMapper mapper = new ObjectMapper();
 
-	public MultipartMixedHttpMessageConverter(Class<T> clazz) {
+	public MultipartMixedHttpMessageConverter(Class<T> contentClass) {
 		super(MIMEType.MULTIPART_MIXED);
-		this.clazz = clazz;
+		this.contentClass = contentClass;
 	}
 
 	@Override
 	protected boolean supports(Class<?> clazz) {
-		return List.class.equals(clazz);
+		return Collection.class.isAssignableFrom(clazz);
 	}
 
 	@Override
-	protected List<RiakResponse<T>> readInternal(
-			Class<? extends List<RiakResponse<T>>> clazz,
+	protected Collection<RiakResponse<T>> readInternal(
+			Class<? extends Collection<RiakResponse<T>>> clazz,
 			final HttpInputMessage inputMessage) throws IOException,
 			HttpMessageNotReadableException {
 		try {
-			List<RiakResponse<T>> responses = new ArrayList<RiakResponse<T>>();
-			processMultipart(
-					new MimeMultipart(new ByteArrayDataSource(
-							inputMessage.getBody(),
+			Collection<RiakResponse<T>> responses = new ArrayList<RiakResponse<T>>();
+			processMultipart(new MimeMultipart(
+					new ByteArrayDataSource(inputMessage.getBody(),
 							MIMEType.MULTIPART_MIXED.toString())), responses);
 			return responses;
 		} catch (MessagingException e) {
@@ -77,12 +76,13 @@ public class MultipartMixedHttpMessageConverter<T> extends
 	}
 
 	@SuppressWarnings("unchecked")
-	private void processMultipart(Multipart mpart, List<RiakResponse<T>> list)
-			throws MessagingException, IOException {
+	private void processMultipart(Multipart mpart,
+			Collection<RiakResponse<T>> collection) throws MessagingException,
+			IOException {
 		for (int index = 0; index < mpart.getCount(); index++) {
 			BodyPart part = mpart.getBodyPart(index);
 			if (part.getContent() instanceof Multipart) {
-				processMultipart((Multipart) part.getContent(), list);
+				processMultipart((Multipart) part.getContent(), collection);
 			} else {
 
 				HttpHeaders headers = new HttpHeaders();
@@ -92,16 +92,18 @@ public class MultipartMixedHttpMessageConverter<T> extends
 					headers.add(header.getName(), header.getValue());
 				}
 
-				list.add(new RiakRestResponse<T>(part.getContent().getClass()
-						.equals(this.clazz) ? (T) part.getContent() : mapper
-						.convertValue(part.getContent(), this.clazz), headers,
+				collection.add(new RiakRestResponse<T>(
+						this.contentClass.isAssignableFrom(part.getContent()
+								.getClass()) ? (T) part.getContent() : mapper
+								.convertValue(part.getContent(),
+										this.contentClass), headers,
 						HttpStatus.OK.toString()));
 			}
 		}
 	}
 
 	@Override
-	protected void writeInternal(List<RiakResponse<T>> t,
+	protected void writeInternal(Collection<RiakResponse<T>> t,
 			HttpOutputMessage outputMessage) throws IOException,
 			HttpMessageNotWritableException {
 		throw new UnsupportedOperationException("This is currently unsupported");
