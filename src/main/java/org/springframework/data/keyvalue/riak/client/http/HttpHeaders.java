@@ -41,7 +41,7 @@ public class HttpHeaders extends org.springframework.http.HttpHeaders implements
 		this.putAll(org.springframework.http.HttpHeaders
 				.readOnlyHttpHeaders(headers));
 	}
-	
+
 	public HttpHeaders() {
 		super();
 	}
@@ -51,4 +51,7 @@ public class HttpHeaders extends org.springframework.http.HttpHeaders implements
 		return this.toSingleValueMap();
 	}
 
+	public String getRiakVclock() {
+		return getFirst(X_RIAK_VCLOCK);
+	}
 }

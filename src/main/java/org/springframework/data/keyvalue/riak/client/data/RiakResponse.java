@@ -30,4 +30,6 @@ public interface RiakResponse<T> extends Serializable {
 	RiakExtraInfo getExtraInfo();
 	
 	String getResponseStatus();
+	
+	String getVectorClock();
 }

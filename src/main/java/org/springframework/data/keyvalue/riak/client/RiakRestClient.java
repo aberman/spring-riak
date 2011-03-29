@@ -17,6 +17,7 @@ package org.springframework.data.keyvalue.riak.client;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -24,7 +25,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -74,7 +75,9 @@ public class RiakRestClient implements RiakManager {
 
 	private boolean useSSL = false;
 
-	private String clientId = RandomStringUtils.randomAlphanumeric(10);
+	private String clientId;
+
+	private boolean clientIdConverted = false;
 
 	private RestTemplate restTemplate = new RestTemplate();
 
@@ -140,11 +143,27 @@ public class RiakRestClient implements RiakManager {
 	}
 
 	public String getClientId() {
-		return clientId;
+		if (this.clientId != null && this.clientIdConverted)
+			return this.clientId;
+
+		byte[] bytes;
+		if (this.clientId == null) {
+			bytes = new byte[4];
+			new SecureRandom().nextBytes(bytes);
+		} else {
+			byte[] temp = this.clientId.getBytes();
+			bytes = new byte[] { temp[0], temp[1], temp[2], temp[3] };
+		}
+		
+		this.clientId = Base64.encodeBase64String(bytes);
+		this.clientIdConverted = true;
+
+		return this.clientId;
 	}
 
 	public void setClientId(String clientId) {
 		this.clientId = clientId;
+		this.clientIdConverted = false;
 	}
 
 	private MultiValueMap<String, String> getHeadersMap(

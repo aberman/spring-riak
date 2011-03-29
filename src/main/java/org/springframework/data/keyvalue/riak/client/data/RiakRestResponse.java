@@ -77,4 +77,13 @@ public class RiakRestResponse<T> implements RiakResponse<T> {
 		return this.key;
 	}
 
+	@Override
+	public String getVectorClock() {
+		if (this.extraInfo != null) {
+			return this.extraInfo.getRiakVclock();
+		}
+
+		return null;
+	}
+
 }

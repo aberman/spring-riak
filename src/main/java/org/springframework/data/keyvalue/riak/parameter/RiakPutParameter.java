@@ -39,9 +39,9 @@ public class RiakPutParameter extends RiakStoreParameter {
 				Type.QUERY);
 	}
 
-	public static final RiakPutParameter vclock(long vclock) {
+	public static final RiakPutParameter vclock(String vclock) {
 		return new RiakPutParameter(HttpHeaders.X_RIAK_VCLOCK,
-				String.valueOf(vclock), Type.HEADER);
+				vclock, Type.HEADER);
 	}
 
 	public static final RiakPutParameter ifNoneMatch(String etag) {
