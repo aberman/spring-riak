@@ -17,7 +17,7 @@ package org.springframework.data.keyvalue.riak.client.http;
 
 import java.util.Map;
 
-import org.springframework.data.keyvalue.riak.util.RiakExtraInfo;
+import org.springframework.data.keyvalue.riak.client.data.RiakExtraInfo;
 
 /**
  * @author Andrew Berman

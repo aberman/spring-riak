@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.keyvalue.riak.util;
+package org.springframework.data.keyvalue.riak.client.data;
 
 import java.util.Map;
 
