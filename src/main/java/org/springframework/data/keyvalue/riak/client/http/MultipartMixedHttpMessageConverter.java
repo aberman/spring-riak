@@ -71,7 +71,7 @@ public class MultipartMixedHttpMessageConverter<T> extends
 			return responses;
 		} catch (MessagingException e) {
 			throw new HttpMessageNotReadableException(
-					"Soemthing wrong with the MIME content", e);
+					"Something is wrong with the MIME content", e);
 		}
 	}
 
