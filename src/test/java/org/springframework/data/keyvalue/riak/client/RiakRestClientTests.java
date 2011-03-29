@@ -30,6 +30,7 @@ import org.springframework.data.keyvalue.riak.mapreduce.RiakLinkPhase;
 import org.springframework.data.keyvalue.riak.mapreduce.RiakMapReduceJob;
 import org.springframework.data.keyvalue.riak.mapreduce.filter.RiakKeyFilterRestrictions;
 import org.springframework.data.keyvalue.riak.parameter.RiakBucketReadParameter;
+import org.springframework.data.keyvalue.riak.parameter.RiakPutParameter;
 import org.springframework.data.keyvalue.riak.parameter.RiakBucketReadParameter.KeyRetrievalType;
 import org.springframework.data.keyvalue.riak.parameter.RiakStoreParameter;
 import org.testng.Assert;
@@ -51,7 +52,7 @@ public class RiakRestClientTests {
 
 	public static final String TEST_VALUE = "this is a test value";
 
-	public static final boolean ENABLED = true;
+	public static final boolean ENABLED = false;
 
 	@BeforeClass
 	public static void setUp() {
@@ -164,7 +165,7 @@ public class RiakRestClientTests {
 	/*
 	 * Link test
 	 */
-	@Test
+	@Test(enabled = ENABLED)
 	public void linkTest() {
 		String id = restClient.storeValue(TEST_BUCKET, "Value 1");
 		String id2 = restClient.storeValue(TEST_BUCKET, "Value 2");
@@ -186,15 +187,30 @@ public class RiakRestClientTests {
 		}
 	}
 
-	@Test
+	@Test(enabled = ENABLED)
 	public void pingTest() {
 		assertEquals(restClient.ping(), true);
 	}
 
-	@Test
+	@Test(enabled = ENABLED)
 	public void statsTest() {
 		Map<String, Object> map = restClient.stats();
 		assertNotNull(map);
 		Assert.assertTrue(map.size() > 1);
+	}
+	
+	@Test
+	public void optimisticConcurrencyTest() {
+		restClient.setBucketProperties(TEST_BUCKET, RiakBucketProperty.allowMulti(true));
+		String id = restClient.storeValue(TEST_BUCKET, "Value 1");
+		RiakManager manager = new RiakRestClient("localhost");
+		String vclock = manager.getValue(TEST_BUCKET, id, String.class).getVectorClock();
+		manager.storeKeyValue(TEST_BUCKET, id, "Value 2", RiakPutParameter.vclock(vclock));
+		
+		RiakManager manager2 = new RiakRestClient("localhost");
+		manager2.storeKeyValue(TEST_BUCKET, id, "Value 3", RiakPutParameter.vclock(vclock));
+		
+		RiakResponse<String> rr = restClient.getValue(TEST_BUCKET, id, String.class);
+		rr.getBody();
 	}
 }

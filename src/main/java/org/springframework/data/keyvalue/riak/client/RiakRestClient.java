@@ -15,6 +15,7 @@
  */
 package org.springframework.data.keyvalue.riak.client;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.SecureRandom;
@@ -154,10 +155,14 @@ public class RiakRestClient implements RiakManager {
 			byte[] temp = this.clientId.getBytes();
 			bytes = new byte[] { temp[0], temp[1], temp[2], temp[3] };
 		}
-		
-		this.clientId = Base64.encodeBase64String(bytes);
-		this.clientIdConverted = true;
 
+		try {
+			this.clientId = new String(Base64.encodeBase64(bytes), "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			
+		}
+		
+		this.clientIdConverted = true;
 		return this.clientId;
 	}
 
@@ -315,8 +320,9 @@ public class RiakRestClient implements RiakManager {
 	@Override
 	public <T> RiakResponse<T> getValue(String bucket, String key,
 			Class<T> clazz, RiakReadParameter... params) throws RiakException {
-		return new RiakRestResponse<T>(executeRiak(HttpMethod.GET, null,
-				params, clazz, bucket, key), key);
+		ResponseEntity<T> re = executeRiak(HttpMethod.GET, null, params, clazz,
+				bucket, key);
+		return new RiakRestResponse<T>(re, key);
 	}
 
 	@Override
