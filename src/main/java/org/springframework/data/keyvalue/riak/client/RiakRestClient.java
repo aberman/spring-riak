@@ -76,9 +76,9 @@ public class RiakRestClient implements RiakManager {
 
 	private String clientId = RandomStringUtils.randomAlphanumeric(10);
 
-	private static RestTemplate restTemplate = new RestTemplate();
+	private RestTemplate restTemplate = new RestTemplate();
 
-	private static final ObjectMapper mapper = new ObjectMapper();
+	private ObjectMapper mapper = new ObjectMapper();
 
 	private static final String RIAK_PATH = "riak";
 
