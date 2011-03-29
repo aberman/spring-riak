@@ -36,35 +36,38 @@ public class RiakBucketProperty<T> {
 
 	public static final RiakBucketProperty<Boolean> allowMulti(
 			boolean allowMulti) {
-		return new RiakBucketProperty<Boolean>(RiakConstants.ALLOW_MULT, new Boolean(
-				allowMulti));
+		return new RiakBucketProperty<Boolean>(RiakConstants.ALLOW_MULT,
+				new Boolean(allowMulti));
 	}
 
 	public static final RiakBucketProperty<Boolean> lastWriteWins(
 			boolean lastWriteWins) {
-		return new RiakBucketProperty<Boolean>(RiakConstants.LAST_WRITE_WINS, new Boolean(
-				lastWriteWins));
+		return new RiakBucketProperty<Boolean>(RiakConstants.LAST_WRITE_WINS,
+				new Boolean(lastWriteWins));
 	}
 
-	public static final RiakBucketProperty<String[]> preCommit(
-			String[] preCommit) {
-		return new RiakBucketProperty<String[]>(RiakConstants.PRE_COMMIT, preCommit);
+	public static final RiakBucketProperty<RiakPrecommitHook[]> preCommit(
+			RiakPrecommitHook... preCommit) {
+		return new RiakBucketProperty<RiakPrecommitHook[]>(
+				RiakConstants.PRE_COMMIT, preCommit);
 	}
 
-	public static final RiakBucketProperty<String[]> postCommit(
-			String[] postCommit) {
-		return new RiakBucketProperty<String[]>(RiakConstants.POST_COMMIT, postCommit);
+	public static final RiakBucketProperty<RiakPostcommitHook[]> postCommit(
+			RiakPostcommitHook... postCommit) {
+		return new RiakBucketProperty<RiakPostcommitHook[]>(
+				RiakConstants.POST_COMMIT, postCommit);
 	}
 
 	public static final RiakBucketProperty<Map<String, String>> chashKeyFun(
 			Map<String, String> chashKeyFun) {
-		return new RiakBucketProperty<Map<String, String>>(RiakConstants.CHASH_KEYFUN,
-				chashKeyFun);
+		return new RiakBucketProperty<Map<String, String>>(
+				RiakConstants.CHASH_KEYFUN, chashKeyFun);
 	}
 
 	public static final RiakBucketProperty<Map<String, String>> linkFun(
 			Map<String, String> linkFun) {
-		return new RiakBucketProperty<Map<String, String>>(RiakConstants.LINKFUN, linkFun);
+		return new RiakBucketProperty<Map<String, String>>(
+				RiakConstants.LINKFUN, linkFun);
 	}
 
 	public static final RiakBucketProperty<Long> oldVClock(Long oldVClock) {
@@ -72,7 +75,8 @@ public class RiakBucketProperty<T> {
 	}
 
 	public static final RiakBucketProperty<Long> youngVClock(Long youngVClock) {
-		return new RiakBucketProperty<Long>(RiakConstants.YOUNG_VCLOCK, youngVClock);
+		return new RiakBucketProperty<Long>(RiakConstants.YOUNG_VCLOCK,
+				youngVClock);
 	}
 
 	public static final RiakBucketProperty<Long> bigVClock(Long bigVClock) {
@@ -80,7 +84,8 @@ public class RiakBucketProperty<T> {
 	}
 
 	public static final RiakBucketProperty<Long> smallVClock(Long smallVClock) {
-		return new RiakBucketProperty<Long>(RiakConstants.SMALL_VCLOCK, smallVClock);
+		return new RiakBucketProperty<Long>(RiakConstants.SMALL_VCLOCK,
+				smallVClock);
 	}
 
 	public static final RiakBucketProperty<RiakQuorumValue> read(
@@ -90,17 +95,20 @@ public class RiakBucketProperty<T> {
 
 	public static final RiakBucketProperty<RiakQuorumValue> write(
 			RiakQuorumValue write) {
-		return new RiakBucketProperty<RiakQuorumValue>(RiakConstants.WRITE, write);
+		return new RiakBucketProperty<RiakQuorumValue>(RiakConstants.WRITE,
+				write);
 	}
 
 	public static final RiakBucketProperty<RiakQuorumValue> readWrite(
 			RiakQuorumValue readWrite) {
-		return new RiakBucketProperty<RiakQuorumValue>(RiakConstants.READ_WRITE, readWrite);
+		return new RiakBucketProperty<RiakQuorumValue>(
+				RiakConstants.READ_WRITE, readWrite);
 	}
 
 	public static final RiakBucketProperty<RiakQuorumValue> durableWrite(
 			RiakQuorumValue durableWrite) {
-		return new RiakBucketProperty<RiakQuorumValue>(RiakConstants.DURABLE_WRITE, durableWrite);
+		return new RiakBucketProperty<RiakQuorumValue>(
+				RiakConstants.DURABLE_WRITE, durableWrite);
 	}
 
 	public static final RiakBucketProperty<String> backend(String backend) {
