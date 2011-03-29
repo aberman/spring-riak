@@ -19,11 +19,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.codehaus.jackson.map.ObjectMapper;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.springframework.data.keyvalue.riak.client.RiakException;
 import org.springframework.data.keyvalue.riak.client.RiakManager;
+import org.springframework.data.keyvalue.riak.client.RiakObjectNotFoundException;
 import org.springframework.data.keyvalue.riak.client.data.RiakBucket;
 import org.springframework.data.keyvalue.riak.client.data.RiakResponse;
+import org.springframework.data.keyvalue.riak.mapreduce.RiakJavascriptFunction;
 import org.springframework.data.keyvalue.riak.mapreduce.RiakMapReduceJob;
 import org.springframework.data.keyvalue.riak.parameter.RiakBucketReadParameter;
 import org.springframework.data.keyvalue.riak.parameter.RiakBucketReadParameter.KeyRetrievalType;
@@ -35,15 +37,12 @@ import org.springframework.util.Assert;
  */
 public class RiakTemplate extends RiakAccessor implements RiakOperations {
 
-	private ObjectMapper mapper;
-
 	public RiakTemplate() {
 
 	}
 
 	public RiakTemplate(RiakManager riakManager) {
 		setRiakManager(riakManager);
-		mapper = new ObjectMapper();
 		afterPropertiesSet();
 	}
 
@@ -74,11 +73,8 @@ public class RiakTemplate extends RiakAccessor implements RiakOperations {
 			RiakResponse<T> response = getRiakManager().getValue(bucket, key,
 					entityClass);
 			return response.getBody();
-		} catch (RiakException e) {
+		} catch (RiakObjectNotFoundException e) {
 			return null;
-		} catch (Exception e) {
-			throw new RuntimeException(
-					"There was a problem deserializing the data", e);
 		}
 	}
 
@@ -173,8 +169,7 @@ public class RiakTemplate extends RiakAccessor implements RiakOperations {
 	 */
 	@Override
 	public String persist(Object entity) throws RiakDataException {
-		return persist(entity.getClass().getName(),
-				mapper.convertValue(entity, byte[].class));
+		return persist(entity.getClass().getName(), entity);
 	}
 
 	/*
@@ -185,7 +180,7 @@ public class RiakTemplate extends RiakAccessor implements RiakOperations {
 	 * .String, byte[])
 	 */
 	@Override
-	public String persist(String bucket, byte[] value) throws RiakDataException {
+	public String persist(String bucket, Object value) throws RiakDataException {
 		return getRiakManager().storeValue(bucket, value);
 	}
 
@@ -198,13 +193,7 @@ public class RiakTemplate extends RiakAccessor implements RiakOperations {
 	 */
 	@Override
 	public void persist(Object entity, String key) throws RiakDataException {
-		try {
-			persist(entity.getClass().getName(), key,
-					mapper.writeValueAsBytes(entity));
-		} catch (Exception e) {
-			logger.error("Error serializing object");
-			throw new RuntimeException(e);
-		}
+		persist(entity.getClass().getName(), key, entity);
 	}
 
 	/*
@@ -215,8 +204,8 @@ public class RiakTemplate extends RiakAccessor implements RiakOperations {
 	 * .String, java.lang.String, byte[])
 	 */
 	@Override
-	public void persist(final String bucket, final String key,
-			final byte[] value) throws RiakDataException {
+	public void persist(String bucket, String key, Object value)
+			throws RiakDataException {
 		getRiakManager().storeKeyValue(bucket, key, value);
 	}
 
@@ -245,6 +234,13 @@ public class RiakTemplate extends RiakAccessor implements RiakOperations {
 		getRiakManager().deleteKey(bucket, key);
 	}
 
+	@Override
+	public void removeAll(String bucket, Collection<String> keys)
+			throws RiakDataException {
+		for (String key : keys)
+			remove(bucket, key);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -255,8 +251,19 @@ public class RiakTemplate extends RiakAccessor implements RiakOperations {
 	@Override
 	public void removeAll(Class<?> entityClass, Collection<String> keys)
 			throws RiakDataException {
-		for (String key : keys)
-			remove(entityClass, key);
+		removeAll(entityClass.getName(), keys);
+	}
+
+	@Override
+	public void removeAllKeys(Class<?> entityClass) throws RiakDataException {
+		RiakBucket bucket = getRiakManager()
+				.getBucketInformation(
+						entityClass.getName(),
+						RiakBucketReadParameter
+								.keyRetrievalType(KeyRetrievalType.TRUE),
+						RiakBucketReadParameter.showProperties(false));
+
+		removeAll(entityClass, bucket.getKeys());
 	}
 
 	/*
@@ -267,10 +274,22 @@ public class RiakTemplate extends RiakAccessor implements RiakOperations {
 	 * java.lang .Class, java.lang.String)
 	 */
 	@Override
-	public <T> T findByProperty(Class<T> entityClass, String property)
-			throws RiakDataException {
-		// TODO Auto-generated method stub
-		return null;
+	public <T> List<T> findByProperty(Class<T> entityClass, String property,
+			Object propertyValue) throws RiakDataException {
+		return getRiakManager()
+				.executeMapReduceJob(
+						new RiakMapReduceJob(entityClass.getName())
+								.addMap(RiakJavascriptFunction.src(String
+										.format("function (v) {"
+												+ "var val = Riak.mapValuesJson(v)[0];"
+												+ "if (String(val['%s']) == '%s') {"
+												+ "return [data];}"
+												+ "else {return [];}}",
+												property,
+												StringEscapeUtils
+														.escapeJavaScript(propertyValue
+																.toString())))),
+						entityClass).getBody();
 	}
 
 	/*

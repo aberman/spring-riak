@@ -333,14 +333,12 @@ public class RiakRestClient implements RiakManager {
 
 		@Override
 		public void processResult(RiakResponse<Object[]> response) {
-			if (response.getBody().length > 0) {
-				this.returnResponse = new RiakRestResponse<List<T>>(
-						(List<T>) mapper.convertValue(response.getBody(),
-								TypeFactory.collectionType(List.class,
-										this.clazz)),
-						(HttpHeaders) response.getExtraInfo(),
-						response.getResponseStatus());
-			}
+			this.returnResponse = new RiakRestResponse<List<T>>(
+					(List<T>) mapper.convertValue(response.getBody(),
+							TypeFactory.collectionType(List.class, this.clazz)),
+					(HttpHeaders) response.getExtraInfo(), response
+							.getResponseStatus());
+
 		}
 
 		public RiakResponse<List<T>> getResponse() {

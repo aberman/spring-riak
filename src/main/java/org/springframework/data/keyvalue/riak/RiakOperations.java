@@ -35,8 +35,8 @@ public interface RiakOperations {
 	<T> List<T> find(Collection<String> keys, Class<T> entityClass)
 			throws RiakDataException;
 
-	<T> List<T> find(String bucket, Collection<String> keys, Class<T> entityClass)
-			throws RiakDataException;
+	<T> List<T> find(String bucket, Collection<String> keys,
+			Class<T> entityClass) throws RiakDataException;
 
 	List<Object> find(String bucket, Collection<String> keys)
 			throws RiakDataException;
@@ -50,22 +50,27 @@ public interface RiakOperations {
 
 	String persist(Object entity) throws RiakDataException;
 
-	String persist(String bucket, byte[] value) throws RiakDataException;
+	String persist(String bucket, Object value) throws RiakDataException;
 
 	void persist(Object entity, String key) throws RiakDataException;
 
-	void persist(String bucket, String key, byte[] value)
+	void persist(String bucket, String key, Object value)
 			throws RiakDataException;
 
 	void remove(Class<?> entityClass, String key) throws RiakDataException;
 
 	void remove(String bucket, String key) throws RiakDataException;
 
+	void removeAll(String bucket, Collection<String> keys)
+			throws RiakDataException;
+
 	void removeAll(Class<?> entityClass, Collection<String> keys)
 			throws RiakDataException;
 
-	<T> T findByProperty(Class<T> entityClass, String property)
-			throws RiakDataException;
+	void removeAllKeys(Class<?> entityClass) throws RiakDataException;
+
+	<T> List<T> findByProperty(Class<T> entityClass, String property,
+			Object propertyValue) throws RiakDataException;
 
 	<T> T executeMapReduceJobSingleResult(RiakMapReduceJob job,
 			Class<T> entityClass) throws RiakDataException;
