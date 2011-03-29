@@ -282,8 +282,8 @@ public class RiakTemplate extends RiakAccessor implements RiakOperations {
 								.addMap(RiakJavascriptFunction.src(String
 										.format("function (v) {"
 												+ "var val = Riak.mapValuesJson(v)[0];"
-												+ "if (String(val['%s']) == '%s') {"
-												+ "return [data];}"
+												+ "if (String(val.%s) == '%s') {"
+												+ "return [val];}"
 												+ "else {return [];}}",
 												property,
 												StringEscapeUtils
@@ -303,8 +303,12 @@ public class RiakTemplate extends RiakAccessor implements RiakOperations {
 	@Override
 	public <T> T executeMapReduceJobSingleResult(RiakMapReduceJob job,
 			Class<T> entityClass) throws RiakDataException {
-		// TODO Auto-generated method stub
-		return null;
+		List<T> responses = executeMapReduceJob(job, entityClass);
+
+		if (responses.isEmpty())
+			return null;
+
+		return responses.get(0);
 	}
 
 	/*
@@ -317,8 +321,7 @@ public class RiakTemplate extends RiakAccessor implements RiakOperations {
 	@Override
 	public <T> List<T> executeMapReduceJob(RiakMapReduceJob job,
 			Class<T> entityClass) throws RiakDataException {
-		// TODO Auto-generated method stub
-		return null;
+		return getRiakManager().executeMapReduceJob(job, entityClass).getBody();
 	}
 
 	/*
