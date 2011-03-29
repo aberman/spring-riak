@@ -38,7 +38,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 
 /**
- * @author andrewberman
+ * @author Andrew Berman
  * 
  */
 public class MultipartMixedHttpMessageConverter<T> extends

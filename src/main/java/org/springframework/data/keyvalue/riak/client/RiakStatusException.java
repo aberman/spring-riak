@@ -16,7 +16,7 @@
 package org.springframework.data.keyvalue.riak.client;
 
 /**
- * @author andrewberman
+ * @author Andrew Berman
  *
  */
 public abstract class RiakStatusException extends RiakException {

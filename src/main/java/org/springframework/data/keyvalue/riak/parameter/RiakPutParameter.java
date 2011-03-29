@@ -25,7 +25,7 @@ import org.springframework.data.keyvalue.riak.client.http.HttpHeaders;
 import org.springframework.data.keyvalue.riak.util.RiakConstants;
 
 /**
- * @author andrewberman
+ * @author Andrew Berman
  * 
  */
 public class RiakPutParameter extends RiakStoreParameter {

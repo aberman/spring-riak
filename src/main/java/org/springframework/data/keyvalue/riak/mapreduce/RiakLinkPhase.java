@@ -19,7 +19,7 @@ import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 
 /**
- * @author andrewberman
+ * @author Andrew Berman
  * 
  */
 public class RiakLinkPhase extends RiakAbstractPhaseFunction<RiakLinkPhase> {

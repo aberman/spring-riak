@@ -16,7 +16,7 @@
 package org.springframework.data.keyvalue.riak.util;
 
 /**
- * @author andrewberman
+ * @author Andrew Berman
  * 
  */
 public abstract class RiakConstants {

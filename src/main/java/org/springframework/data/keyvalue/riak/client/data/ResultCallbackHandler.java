@@ -17,7 +17,7 @@ package org.springframework.data.keyvalue.riak.client.data;
 
 
 /**
- * @author andrewberman
+ * @author Andrew Berman
  * 
  */
 public interface ResultCallbackHandler {

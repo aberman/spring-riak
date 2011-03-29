@@ -21,7 +21,7 @@ import java.util.Map;
 import org.springframework.http.MediaType;
 
 /**
- * @author andrewberman
+ * @author Andrew Berman
  * 
  */
 public class MIMEType extends MediaType {

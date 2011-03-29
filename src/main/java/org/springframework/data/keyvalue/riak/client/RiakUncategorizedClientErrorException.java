@@ -16,7 +16,7 @@
 package org.springframework.data.keyvalue.riak.client;
 
 /**
- * @author andrewberman
+ * @author Andrew Berman
  *
  */
 public class RiakUncategorizedClientErrorException extends
