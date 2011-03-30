@@ -17,6 +17,7 @@ package org.springframework.data.keyvalue.riak.client;
 
 import java.util.List;
 
+import org.springframework.data.keyvalue.riak.RiakLink;
 import org.springframework.data.keyvalue.riak.RiakTemplate;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
@@ -38,12 +39,35 @@ public class RiakRestTemplateTests {
 
 	public static final boolean ENABLED = true;
 
+	public static class TestObject2 {
+		private String id;
+		
+		public TestObject2(String id) {
+			this.id = id;
+		}
+
+		public String getId() {
+			return this.id;
+		}
+	}
+
 	public static class TestObject {
 		private String stringProp;
 
-		private Integer intProp;;
+		private Integer intProp;
 
 		private Boolean boolProp;
+
+		@RiakLink(property = "id", value = "test2")
+		private TestObject2 test2 = new TestObject2("testingid");
+
+		public TestObject2 getTest2() {
+			return test2;
+		}
+
+		public void setTest2(TestObject2 test2) {
+			this.test2 = test2;
+		}
 
 		public String getStringProp() {
 			return stringProp;

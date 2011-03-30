@@ -15,6 +15,7 @@
  */
 package org.springframework.data.keyvalue.riak;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -24,12 +25,16 @@ import org.springframework.data.keyvalue.riak.client.RiakException;
 import org.springframework.data.keyvalue.riak.client.RiakManager;
 import org.springframework.data.keyvalue.riak.client.RiakObjectNotFoundException;
 import org.springframework.data.keyvalue.riak.client.data.RiakBucket;
+import org.springframework.data.keyvalue.riak.client.data.RiakLink;
 import org.springframework.data.keyvalue.riak.client.data.RiakResponse;
 import org.springframework.data.keyvalue.riak.mapreduce.RiakJavascriptFunction;
 import org.springframework.data.keyvalue.riak.mapreduce.RiakMapReduceJob;
 import org.springframework.data.keyvalue.riak.parameter.RiakBucketReadParameter;
 import org.springframework.data.keyvalue.riak.parameter.RiakBucketReadParameter.KeyRetrievalType;
 import org.springframework.util.Assert;
+import org.springframework.util.ReflectionUtils;
+import org.springframework.util.ReflectionUtils.FieldCallback;
+import org.springframework.util.ReflectionUtils.FieldFilter;
 
 /**
  * @author Andrew Berman
@@ -44,6 +49,42 @@ public class RiakTemplate extends RiakAccessor implements RiakOperations {
 	public RiakTemplate(RiakManager riakManager) {
 		setRiakManager(riakManager);
 		afterPropertiesSet();
+	}
+
+	private List<RiakLink> getLinksFromObject(final Object val) {
+		final List<RiakLink> listOfLinks = new ArrayList<RiakLink>();
+		ReflectionUtils.doWithFields(val.getClass(), new FieldCallback() {
+
+			@Override
+			public void doWith(Field field) throws IllegalArgumentException,
+					IllegalAccessException {
+				ReflectionUtils.makeAccessible(field);
+				org.springframework.data.keyvalue.riak.RiakLink linkAnnot = field
+						.getAnnotation(org.springframework.data.keyvalue.riak.RiakLink.class);
+				String property = linkAnnot.property();
+				Object referencedObj = field.get(val);
+				Field prop = ReflectionUtils.findField(
+						referencedObj.getClass(), property);
+				ReflectionUtils.makeAccessible(prop);
+				try {
+					listOfLinks.add(new RiakLink(field.getType().getName(),
+							prop.get(referencedObj).toString(), linkAnnot
+									.value()));
+				} catch (SecurityException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}, new FieldFilter() {
+
+			@Override
+			public boolean matches(Field field) {
+				return field
+						.isAnnotationPresent(org.springframework.data.keyvalue.riak.RiakLink.class);
+			}
+		});
+
+		return listOfLinks;
 	}
 
 	/*
@@ -181,6 +222,7 @@ public class RiakTemplate extends RiakAccessor implements RiakOperations {
 	 */
 	@Override
 	public String persist(String bucket, Object value) throws RiakDataException {
+		List<RiakLink> links = getLinksFromObject(value);
 		return getRiakManager().storeValue(bucket, value);
 	}
 
