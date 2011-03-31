@@ -65,7 +65,7 @@ public abstract class RiakKeyFilterRestrictions {
 		return new RiakSimplePredicate("eq", value);
 	}
 
-	public static RiakSimplePredicate isMember(Set<Object> set) {
+	public static RiakSimplePredicate isMemberOf(Set<? extends Object> set) {
 		return new RiakSimplePredicate("set_member", set);
 	}
 
