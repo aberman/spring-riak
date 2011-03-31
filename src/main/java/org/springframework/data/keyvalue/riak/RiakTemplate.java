@@ -373,7 +373,7 @@ public class RiakTemplate extends RiakAccessor implements RiakOperations {
 	 * springframework .data.riak.RiakCallback)
 	 */
 	@Override
-	public <T> T execute(RiakCallback<T> action) throws RiakDataException {
+	public void execute(RiakCallback action) throws RiakDataException {
 		Assert.notNull(action, "Callback object must not be null");
 
 		RiakManager rm = getRiakManager();
@@ -383,7 +383,7 @@ public class RiakTemplate extends RiakAccessor implements RiakOperations {
 		}
 
 		try {
-			return action.doInRiak(rm);
+			action.doInRiak(rm);
 		} catch (RiakException ex) {
 			throw new RiakDataException(ex.getMessage(), ex);
 		}

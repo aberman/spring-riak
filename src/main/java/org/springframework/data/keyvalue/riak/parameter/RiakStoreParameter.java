@@ -15,6 +15,10 @@
  */
 package org.springframework.data.keyvalue.riak.parameter;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import org.springframework.data.keyvalue.riak.client.data.RiakLink;
 import org.springframework.data.keyvalue.riak.client.data.RiakQuorumValue;
 import org.springframework.data.keyvalue.riak.client.http.HttpHeaders;
@@ -34,28 +38,40 @@ public class RiakStoreParameter extends RiakParameter {
 		super(key, value, type);
 	}
 
-	public static final RiakStoreParameter write(RiakQuorumValue write) {
+	public static RiakStoreParameter write(RiakQuorumValue write) {
 		return new RiakStoreParameter(RiakConstants.WRITE, write.toString(),
 				Type.QUERY);
 	}
 
-	public static final RiakStoreParameter durableWrite(RiakQuorumValue durableWrite) {
+	public static RiakStoreParameter durableWrite(
+			RiakQuorumValue durableWrite) {
 		return new RiakStoreParameter(RiakConstants.DURABLE_WRITE,
 				durableWrite.toString(), Type.QUERY);
 	}
 
-	public static final RiakStoreParameter shouldReturnBody(boolean returnBody) {
+	public static RiakStoreParameter shouldReturnBody(boolean returnBody) {
 		return new RiakStoreParameter(RiakConstants.RETURNBODY,
 				Boolean.toString(returnBody), Type.QUERY);
 	}
 
-	public static final RiakStoreParameter metaDataHeader(String metaData) {
+	public static RiakStoreParameter metaDataHeader(String metaData) {
 		return new RiakStoreParameter(HttpHeaders.X_RIAK_META, metaData,
 				Type.HEADER);
 	}
 
-	public static final RiakStoreParameter link(RiakLink link) {
+	public static RiakStoreParameter link(RiakLink link) {
 		return new RiakStoreParameter(HttpHeaders.LINK, link.toString(),
 				Type.HEADER);
-	}	
+	}
+
+	public static RiakStoreParameter[] links(Collection<RiakLink> links) {
+		List<RiakStoreParameter> list = new ArrayList<RiakStoreParameter>();
+
+		for (RiakLink link : links)
+			list.add(new RiakStoreParameter(HttpHeaders.LINK, link.toString(),
+					Type.HEADER));
+
+		return (RiakStoreParameter[]) list.toArray(new RiakStoreParameter[list
+				.size()]);
+	}
 }

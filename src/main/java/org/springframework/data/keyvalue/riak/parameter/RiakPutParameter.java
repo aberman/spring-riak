@@ -15,11 +15,15 @@
  */
 package org.springframework.data.keyvalue.riak.parameter;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
+import org.springframework.data.keyvalue.riak.client.data.RiakLink;
 import org.springframework.data.keyvalue.riak.client.data.RiakQuorumValue;
 import org.springframework.data.keyvalue.riak.client.http.HttpHeaders;
 import org.springframework.data.keyvalue.riak.util.RiakConstants;
@@ -34,14 +38,18 @@ public class RiakPutParameter extends RiakStoreParameter {
 		super(key, value, Type.HEADER);
 	}
 
+	private RiakPutParameter(RiakStoreParameter param) {
+		super(param.getKey(), param.getValue(), param.getType());
+	}
+
 	public static final RiakPutParameter read(RiakQuorumValue read) {
 		return new RiakPutParameter(RiakConstants.READ, read.toString(),
 				Type.QUERY);
 	}
 
 	public static final RiakPutParameter vclock(String vclock) {
-		return new RiakPutParameter(HttpHeaders.X_RIAK_VCLOCK,
-				vclock, Type.HEADER);
+		return new RiakPutParameter(HttpHeaders.X_RIAK_VCLOCK, vclock,
+				Type.HEADER);
 	}
 
 	public static final RiakPutParameter ifNoneMatch(String etag) {
@@ -65,6 +73,38 @@ public class RiakPutParameter extends RiakStoreParameter {
 				DateTimeFormat.forPattern(HttpHeaders.DATE_PATTERN).print(
 						new DateTime(date).toDateTime(DateTimeZone.UTC)),
 				Type.HEADER);
+	}
+
+	public static RiakPutParameter write(RiakQuorumValue write) {
+		return new RiakPutParameter(RiakStoreParameter.write(write));
+	}
+
+	public static RiakPutParameter durableWrite(RiakQuorumValue durableWrite) {
+		return new RiakPutParameter(
+				RiakStoreParameter.durableWrite(durableWrite));
+	}
+
+	public static RiakPutParameter shouldReturnBody(boolean returnBody) {
+		return new RiakPutParameter(
+				RiakStoreParameter.shouldReturnBody(returnBody));
+	}
+
+	public static RiakPutParameter metaDataHeader(String metaData) {
+		return new RiakPutParameter(RiakStoreParameter.metaDataHeader(metaData));
+	}
+
+	public static RiakPutParameter link(RiakLink link) {
+		return new RiakPutParameter(RiakStoreParameter.link(link));
+	}
+
+	public static RiakPutParameter[] links(Collection<RiakLink> links) {
+		List<RiakPutParameter> list = new ArrayList<RiakPutParameter>();
+
+		for (RiakLink link : links)
+			list.add(RiakPutParameter.link(link));
+
+		return (RiakPutParameter[]) list.toArray(new RiakPutParameter[list
+				.size()]);
 	}
 
 }

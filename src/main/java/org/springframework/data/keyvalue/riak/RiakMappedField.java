@@ -17,11 +17,8 @@ package org.springframework.data.keyvalue.riak;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Map;
-
-import org.springframework.util.TypeUtils;
 
 /**
  * @author andrewberman
@@ -38,40 +35,33 @@ public class RiakMappedField {
 	private Class<?> actualType;
 
 	private boolean linkType;
-	
+
 	private boolean isArray;
-	
+
 	private boolean isMap;
-	
+
 	private boolean isCollection;
 
 	public RiakMappedField(Field field, Annotation annot) {
 		this.field = field;
 		this.annotation = annot;
 		this.annotationClass = annot.annotationType();
-
-	}
-
-	private void getType(Field field) {
-		Class<?> fieldType = field.getType();
-
-		if (Collection.class.isAssignableFrom(fieldType)) {
-			this.actualType = fieldType;
-			this.isCollection = true;
-		} else if (fieldType.isArray()) {
-			this.actualType = fieldType;
-			this.isArray = true;
-		} else if (Map.class.isAssignableFrom(fieldType)) {
-			this.actualType = fieldType;
-			this.isMap = true;
-		} else {
-			Type genericType = field.getGenericType();
-			
-		}
+		init();
 	}
 
 	private void init() {
+		Class<?> fieldType = this.field.getType();
 
+		if (Collection.class.isAssignableFrom(fieldType)) {
+			// this.actualType = fieldType;
+			this.isCollection = true;
+		} else if (fieldType.isArray()) {
+			// this.actualType = fieldType;
+			this.isArray = true;
+		} else if (Map.class.isAssignableFrom(fieldType)) {
+			// this.actualType = fieldType;
+			this.isMap = true;
+		}
 	}
 
 	public boolean isLinkType() {

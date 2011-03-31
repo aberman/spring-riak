@@ -15,7 +15,12 @@
  */
 package org.springframework.data.keyvalue.riak.mapreduce.filter.predicate;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.data.keyvalue.riak.mapreduce.filter.RiakKeyFilter;
+import org.springframework.data.keyvalue.riak.mapreduce.filter.RiakKeyFilterRestrictions;
 
 /**
  * @author Andrew Berman
@@ -41,4 +46,12 @@ public class RiakSimplePredicate implements RiakKeyFilter {
 		return new Object[] { filter, value };
 	}
 
+	public static void main(String[] args) throws Exception {
+		Set<String> set = new HashSet<String>();
+		set.add("test");
+		set.add("test2");
+		RiakSimplePredicate pred = RiakKeyFilterRestrictions.isMemberOf(set);
+		ObjectMapper mapper = new ObjectMapper();
+		System.out.println(mapper.writeValueAsString(pred));
+	}
 }

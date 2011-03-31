@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.Embedded;
@@ -86,6 +87,7 @@ public class RiakMappedClass {
 		entityAnnotations.add(Id.class);
 		entityAnnotations.add(Version.class);
 		entityAnnotations.add(Transient.class);
+		entityAnnotations.add(Basic.class);
 
 		lifecycleAnnotations = new ArrayList<Class<? extends Annotation>>();
 		lifecycleAnnotations.add(PrePersist.class);
@@ -154,7 +156,7 @@ public class RiakMappedClass {
 				List<Annotation> annots = org.springframework.data.keyvalue.riak.util.AnnotationUtils
 						.getFoundAnnotation(Id.class, Column.class,
 								Embedded.class, Version.class, ManyToOne.class,
-								OneToMany.class);
+								OneToMany.class, Basic.class);
 
 				// Probably allow auto generation at some point, but for now
 				// have to add one of the annotations
@@ -162,7 +164,7 @@ public class RiakMappedClass {
 					throw new IllegalArgumentException(
 							String.format(
 									"The field %s must have only one of the following annotations: "
-											+ "@Id, @Column, @Embedded, @Version, @ManyToOne, @OneToMany",
+											+ "@Id, @Basic, @Column, @Embedded, @Version, @ManyToOne, @OneToMany",
 									field.getName()));
 
 				Annotation annot = annots.get(0);

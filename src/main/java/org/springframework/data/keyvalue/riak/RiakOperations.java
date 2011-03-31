@@ -78,7 +78,7 @@ public interface RiakOperations {
 	<T> List<T> executeMapReduceJob(RiakMapReduceJob job, Class<T> entityClass)
 			throws RiakDataException;
 
-	<T> T execute(RiakCallback<T> action) throws RiakDataException;
+	void execute(RiakCallback action) throws RiakDataException;
 
 	// Add walking for links
 }
