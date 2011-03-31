@@ -58,22 +58,22 @@ public class RiakTemplate extends RiakAccessor implements RiakOperations {
 			@Override
 			public void doWith(Field field) throws IllegalArgumentException,
 					IllegalAccessException {
-				ReflectionUtils.makeAccessible(field);
+				if (!field.isAccessible())
+					ReflectionUtils.makeAccessible(field);
+
 				org.springframework.data.keyvalue.riak.RiakLink linkAnnot = field
 						.getAnnotation(org.springframework.data.keyvalue.riak.RiakLink.class);
 				String property = linkAnnot.property();
 				Object referencedObj = field.get(val);
 				Field prop = ReflectionUtils.findField(
 						referencedObj.getClass(), property);
-				ReflectionUtils.makeAccessible(prop);
-				try {
-					listOfLinks.add(new RiakLink(field.getType().getName(),
-							prop.get(referencedObj).toString(), linkAnnot
-									.value()));
-				} catch (SecurityException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+
+				if (!prop.isAccessible())
+					ReflectionUtils.makeAccessible(prop);
+
+				listOfLinks.add(new RiakLink(field.getType().getName(), prop
+						.get(referencedObj).toString(), linkAnnot.value()));
+
 			}
 		}, new FieldFilter() {
 
