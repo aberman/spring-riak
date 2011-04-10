@@ -56,7 +56,7 @@ public class RiakRestClientTests {
 
 	@BeforeClass
 	public static void setUp() {
-		restClient = new RiakRestClient("localhost", 8098, false);
+		restClient = new RiakRestClient("192.168.1.6", 8098, false);
 		TEST_KEY = restClient.storeValue(TEST_BUCKET, TEST_VALUE);
 	}
 
@@ -199,15 +199,14 @@ public class RiakRestClientTests {
 		Assert.assertTrue(map.size() > 1);
 	}
 	
-	@Test
 	public void optimisticConcurrencyTest() {
 		restClient.setBucketProperties(TEST_BUCKET, RiakBucketProperty.allowMulti(true));
 		String id = restClient.storeValue(TEST_BUCKET, "Value 1");
-		RiakManager manager = new RiakRestClient("localhost");
+		RiakManager manager = new RiakRestClient("192.168.1.6");
 		String vclock = manager.getValue(TEST_BUCKET, id, String.class).getVectorClock();
 		manager.storeKeyValue(TEST_BUCKET, id, "Value 2", RiakPutParameter.vclock(vclock));
 		
-		RiakManager manager2 = new RiakRestClient("localhost");
+		RiakManager manager2 = new RiakRestClient("192.168.1.6");
 		manager2.storeKeyValue(TEST_BUCKET, id, "Value 3", RiakPutParameter.vclock(vclock));
 		
 		RiakResponse<String> rr = restClient.getValue(TEST_BUCKET, id, String.class);

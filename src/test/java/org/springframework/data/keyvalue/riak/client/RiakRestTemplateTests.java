@@ -58,16 +58,16 @@ public class RiakRestTemplateTests {
 
 		private Boolean boolProp;
 
-		@RiakLink(property = "id", value = "test2")
-		private TestObject2 test2 = new TestObject2("testingid");
+//		@RiakLink(property = "id", value = "test2")
+//		private TestObject2 test2 = new TestObject2("testingid");
 
-		public TestObject2 getTest2() {
-			return test2;
-		}
-
-		public void setTest2(TestObject2 test2) {
-			this.test2 = test2;
-		}
+//		public TestObject2 getTest2() {
+//			return test2;
+//		}
+//
+//		public void setTest2(TestObject2 test2) {
+//			this.test2 = test2;
+//		}
 
 		public String getStringProp() {
 			return stringProp;
@@ -98,7 +98,7 @@ public class RiakRestTemplateTests {
 	@BeforeClass
 	public static void setUp() {
 		template = new RiakTemplate(
-				new RiakRestClient("localhost", 8098, false));
+				new RiakRestClient("192.168.1.6", 8098, false));
 	}
 
 	@AfterClass

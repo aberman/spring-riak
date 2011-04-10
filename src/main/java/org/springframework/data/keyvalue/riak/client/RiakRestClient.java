@@ -30,8 +30,11 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.codehaus.jackson.Version;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.module.SimpleModule;
 import org.codehaus.jackson.map.type.TypeFactory;
+import org.joda.time.DateTime;
 import org.springframework.data.keyvalue.riak.client.data.ResultCallbackHandler;
 import org.springframework.data.keyvalue.riak.client.data.RiakBucket;
 import org.springframework.data.keyvalue.riak.client.data.RiakBucketProperties;
@@ -49,6 +52,7 @@ import org.springframework.data.keyvalue.riak.parameter.RiakParameter.Type;
 import org.springframework.data.keyvalue.riak.parameter.RiakPutParameter;
 import org.springframework.data.keyvalue.riak.parameter.RiakReadParameter;
 import org.springframework.data.keyvalue.riak.parameter.RiakStoreParameter;
+import org.springframework.data.keyvalue.riak.util.JodaDateTimeDeserializer;
 import org.springframework.data.keyvalue.riak.util.RiakConstants;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -99,6 +103,9 @@ public class RiakRestClient implements RiakManager {
 		this(host);
 		this.port = port;
 		this.useSSL = useSSL;
+		mapper.registerModule(new SimpleModule("JodaDateTime", new Version(1,
+				0, 0, null)).addDeserializer(DateTime.class,
+				new JodaDateTimeDeserializer<DateTime>(DateTime.class)));
 	}
 
 	public RiakRestClient(String host) {
@@ -159,9 +166,9 @@ public class RiakRestClient implements RiakManager {
 		try {
 			this.clientId = new String(Base64.encodeBase64(bytes), "UTF-8");
 		} catch (UnsupportedEncodingException e) {
-			
+
 		}
-		
+
 		this.clientIdConverted = true;
 		return this.clientId;
 	}
